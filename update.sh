@@ -524,9 +524,10 @@ update_nss_pbuf_performance() {
 }
 
 set_build_signature() {
+    date_version=$(date +"%y.%m.%d")
     local file="$BUILD_DIR/feeds/luci/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/10_system.js"
     if [ -d "$(dirname "$file")" ] && [ -f $file ]; then
-        sed -i "s/(\(luciversion || ''\))/(\1) + (' \/ build by ZqinKing && Y.Y ')/g" "$file"
+        sed -i "s/(\(luciversion || ''\))/(\1) + (' \/ build by ZqinKing \&\& Y.Y R$date_version')/g" "$file"
     fi
 }
 
@@ -1007,12 +1008,13 @@ main() {
     fix_miniupnpd #修复miniupnpd
     update_golang #更新golang
     change_dnsmasq2full #将dnsmasq更改为完整版
-    # fix_mk_def_depends #修复mk默认依赖
+    fix_mk_def_depends #修复mk默认依赖
     add_wifi_default_set #添加WiFi默认设置
     update_default_lan_addr #更新默认LAN地址
     remove_something_nss_kmod #移除某些nss内核模块
     update_affinity_script #更新亲和性脚本
     update_ath11k_fw #更新ath11k固件
+    # fix_mkpkg_format_invalid
     change_cpuusage #更改CPU使用率
     update_tcping #更新tcping
     # add_ax6600_led #添加ax6600 LED支持
@@ -1026,7 +1028,7 @@ main() {
     fix_compile_coremark #修复coremark编译
     update_dnsmasq_conf #更新dnsmasq配置
     add_backup_info_to_sysupgrade #添加备份信息到系统升级
-    update_mosdns_deconfig #更新mosdns默认配置
+    # update_mosdns_deconfig #更新mosdns默认配置
     fix_quickstart #修复快速启动
     update_oaf_deconfig #更新oaf默认配置
     # add_timecontrol #添加家长时间控制
@@ -1035,7 +1037,7 @@ main() {
     update_lucky #更新lucky
     fix_rust_compile_error #修复rust编译错误
     # update_smartdns #更新smartdns
-    update_diskman #更新diskman
+    # update_diskman #更新diskman
     set_nginx_default_config #设置nginx默认配置
     update_uwsgi_limit_as #更新uwsgi内存限制
     update_argon #更新argon

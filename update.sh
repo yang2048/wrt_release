@@ -178,6 +178,7 @@ update_golang() {
 }
 
 install_small8() {
+    echo "正在安装 small8源软件包..."
     # ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
     #     naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
     #     tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
@@ -194,11 +195,12 @@ install_small8() {
         luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart \
         luci-app-quickstart luci-app-istorex netdata luci-app-netdata \
         lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic \
-        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier cups luci-app-cupsd \
+        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
         luci-app-wechatpush luci-app-taskplan
 }
 
 install_fullconenat() {
+    echo "正在安装 fullconenat..."
     if [ ! -d $BUILD_DIR/package/network/utils/fullconenat-nft ]; then
         ./scripts/feeds install -p small8 -f fullconenat-nft
     fi
@@ -208,6 +210,7 @@ install_fullconenat() {
 }
 
 install_feeds() {
+    echo "正在安装 feeds 软件包..."
     ./scripts/feeds update -i
     for dir in $BUILD_DIR/feeds/*; do
         # 检查是否为目录并且不以 .tmp 结尾，并且不是软链接
@@ -521,10 +524,9 @@ update_nss_pbuf_performance() {
 }
 
 set_build_signature() {
-    date_version=$(date +"%y.%m.%d")
     local file="$BUILD_DIR/feeds/luci/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/10_system.js"
     if [ -d "$(dirname "$file")" ] && [ -f $file ]; then
-        sed -i "s/(\(luciversion || ''\))/(\1) + (' \/ build by ZqinKing && Y.Y R${date_version}')/g" "$file"
+        sed -i "s/(\(luciversion || ''\))/(\1) + (' \/ build by ZqinKing && Y.Y ')/g" "$file"
     fi
 }
 
@@ -1013,7 +1015,7 @@ main() {
     update_ath11k_fw #更新ath11k固件
     change_cpuusage #更改CPU使用率
     update_tcping #更新tcping
-    add_ax6600_led #添加ax6600 LED支持
+    # add_ax6600_led #添加ax6600 LED支持
     set_custom_task #设置自定义任务
     apply_passwall_tweaks #应用passwall调整
     install_opkg_distfeeds #安装opkg发行版feeds

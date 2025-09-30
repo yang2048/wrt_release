@@ -38,7 +38,7 @@ FEEDS_CONF="feeds.conf.default"
 GOLANG_REPO="https://github.com/sbwml/packages_lang_golang"
 GOLANG_BRANCH="25.x"
 THEME_SET="argon"
-LAN_ADDR="192.168.1.1"
+LAN_ADDR="192.168.2.1"
 
 clone_repo() {
     if [[ ! -d $BUILD_DIR ]]; then
@@ -178,15 +178,24 @@ update_golang() {
 }
 
 install_small8() {
-    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
+    # ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
+    #     naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
+    #     tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
+    #     luci-app-passwall v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go \
+    #     luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart \
+    #     luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest netdata luci-app-netdata \
+    #     lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki \
+    #     tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
+    #     msd_lite luci-app-msd_lite cups luci-app-cupsd
+    ./scripts/feeds install -p small8 -f dns2tcp dns2socks haproxy hysteria \
         naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
-        tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
-        luci-app-passwall v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go \
+        tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs \
+        luci-app-passwall v2dat adguardhome luci-app-adguardhome ddns-go \
         luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart \
-        luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest netdata luci-app-netdata \
-        lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki \
-        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
-        msd_lite luci-app-msd_lite cups luci-app-cupsd
+        luci-app-quickstart luci-app-istorex netdata luci-app-netdata \
+        lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic \
+        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier cups luci-app-cupsd \
+        luci-app-wechatpush luci-app-taskplan
 }
 
 install_fullconenat() {
@@ -512,9 +521,10 @@ update_nss_pbuf_performance() {
 }
 
 set_build_signature() {
+    date_version=$(date +"%y.%m.%d")
     local file="$BUILD_DIR/feeds/luci/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/10_system.js"
     if [ -d "$(dirname "$file")" ] && [ -f $file ]; then
-        sed -i "s/(\(luciversion || ''\))/(\1) + (' \/ build by ZqinKing')/g" "$file"
+        sed -i "s/(\(luciversion || ''\))/(\1) + (' \/ build by ZqinKing && Y.Y R${date_version}')/g" "$file"
     fi
 }
 
@@ -984,59 +994,58 @@ update_argon() {
 }
 
 main() {
-    clone_repo
-    clean_up
-    reset_feeds_conf
-    update_feeds
-    remove_unwanted_packages
-    remove_tweaked_packages
-    update_homeproxy
-    fix_default_set
-    fix_miniupnpd
-    update_golang
-    change_dnsmasq2full
-    fix_mk_def_depends
-    add_wifi_default_set
-    update_default_lan_addr
-    remove_something_nss_kmod
-    update_affinity_script
-    update_ath11k_fw
-    # fix_mkpkg_format_invalid
-    change_cpuusage
-    update_tcping
-    add_ax6600_led
-    set_custom_task
-    apply_passwall_tweaks
-    install_opkg_distfeeds
-    update_nss_pbuf_performance
-    set_build_signature
-    update_nss_diag
-    update_menu_location
-    fix_compile_coremark
-    update_dnsmasq_conf
-    add_backup_info_to_sysupgrade
-    update_mosdns_deconfig
-    fix_quickstart
-    update_oaf_deconfig
-    add_timecontrol
-    add_gecoosac
-    add_quickfile
-    update_lucky
-    fix_rust_compile_error
-    update_smartdns
-    update_diskman
-    set_nginx_default_config
-    update_uwsgi_limit_as
-    update_argon
-    install_feeds
-    update_adguardhome
-    update_script_priority
-    update_geoip
-    update_package "runc" "releases" "v1.2.6"
-    update_package "containerd" "releases" "v1.7.27"
-    update_package "docker" "tags" "v28.2.2"
-    update_package "dockerd" "releases" "v28.2.2"
-    apply_hash_fixes # 调用哈希修正函数
+    clone_repo #克隆仓库
+    clean_up #清理临时文件
+    reset_feeds_conf #重置feeds配置
+    update_feeds #更新feeds
+    remove_unwanted_packages #移除不需要的软件包
+    remove_tweaked_packages #移除修改过的软件包
+    update_homeproxy #更新homeproxy
+    fix_default_set #修复默认设置
+    fix_miniupnpd #修复miniupnpd
+    update_golang #更新golang
+    change_dnsmasq2full #将dnsmasq更改为完整版
+    # fix_mk_def_depends #修复mk默认依赖
+    add_wifi_default_set #添加WiFi默认设置
+    update_default_lan_addr #更新默认LAN地址
+    remove_something_nss_kmod #移除某些nss内核模块
+    update_affinity_script #更新亲和性脚本
+    update_ath11k_fw #更新ath11k固件
+    change_cpuusage #更改CPU使用率
+    update_tcping #更新tcping
+    add_ax6600_led #添加ax6600 LED支持
+    set_custom_task #设置自定义任务
+    apply_passwall_tweaks #应用passwall调整
+    install_opkg_distfeeds #安装opkg发行版feeds
+    update_nss_pbuf_performance #更新nss pbuf性能
+    set_build_signature #设置构建签名
+    update_nss_diag #更新nss诊断
+    update_menu_location #更新菜单位置
+    fix_compile_coremark #修复coremark编译
+    update_dnsmasq_conf #更新dnsmasq配置
+    add_backup_info_to_sysupgrade #添加备份信息到系统升级
+    update_mosdns_deconfig #更新mosdns默认配置
+    fix_quickstart #修复快速启动
+    update_oaf_deconfig #更新oaf默认配置
+    # add_timecontrol #添加家长时间控制
+    add_gecoosac #添加gecoosac
+    add_quickfile #添加快速文件
+    update_lucky #更新lucky
+    fix_rust_compile_error #修复rust编译错误
+    # update_smartdns #更新smartdns
+    update_diskman #更新diskman
+    set_nginx_default_config #设置nginx默认配置
+    update_uwsgi_limit_as #更新uwsgi内存限制
+    update_argon #更新argon
+    install_feeds #安装feeds
+    update_adguardhome #更新adguardhome
+    update_script_priority #更新脚本优先级
+    update_geoip #更新geoip
+    update_package "runc" "releases" "v1.2.6" #更新runc包到v1.2.6版本
+    update_package "containerd" "releases" "v1.7.27" #更新containerd包到v1.7.27版本
+    update_package "docker" "tags" "v28.2.2" #更新docker包到v28.2.2版本
+    update_package "dockerd" "releases" "v28.2.2" #更新dockerd包到v28.2.2版本
+    apply_hash_fixes #应用哈希修正
 }
 
 main "$@"

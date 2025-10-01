@@ -107,7 +107,7 @@ remove_unwanted_packages() {
         "luci-app-passwall" "luci-app-ddns-go" "luci-app-rclone" "luci-app-ssr-plus"
         "luci-app-vssr" "luci-app-daed" "luci-app-dae" "luci-app-alist" "luci-app-homeproxy"
         "luci-app-haproxy-tcp" "luci-app-openclash" "luci-app-mihomo" "luci-app-appfilter"
-        "luci-app-msd_lite"
+        "luci-app-msd_lite luci-app-wechatpush lucky"
     )
     local packages_net=(
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
@@ -189,14 +189,14 @@ install_small8() {
     #     tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
     #     msd_lite luci-app-msd_lite cups luci-app-cupsd
     ./scripts/feeds install -p small8 -f dns2tcp dns2socks haproxy hysteria \
-        naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
+        naiveproxy sing-box v2ray-core v2ray-geodata v2ray-plugin \
         tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs \
         luci-app-passwall v2dat adguardhome luci-app-adguardhome ddns-go \
         luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart \
         luci-app-quickstart luci-app-istorex netdata luci-app-netdata \
-        lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic \
-        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
-        luci-app-wechatpush luci-app-taskplan
+        lucky luci-app-lucky luci-app-openclash luci-app-amlogic \
+        oaf open-app-filter luci-app-oaf easytier luci-app-easytier  \
+        luci-app-wechatpush luci-app-taskplan luci-app-turboacc luci-app-samba4
 }
 
 install_fullconenat() {
@@ -223,6 +223,8 @@ install_feeds() {
             fi
         fi
     done
+    echo "显示feeds small8 文件列表"
+    find $BUILD_DIR/feeds/small8/ -type f -exec ls -l {} \;
 }
 
 fix_default_set() {
@@ -1003,7 +1005,7 @@ main() {
     update_feeds #更新feeds
     remove_unwanted_packages #移除不需要的软件包
     remove_tweaked_packages #移除修改过的软件包
-    update_homeproxy #更新homeproxy
+    # update_homeproxy #更新homeproxy
     fix_default_set #修复默认设置
     fix_miniupnpd #修复miniupnpd
     update_golang #更新golang
@@ -1024,11 +1026,10 @@ main() {
     update_nss_pbuf_performance #更新nss pbuf性能
     set_build_signature #设置构建签名
     update_nss_diag #更新nss诊断
-    update_menu_location #更新菜单位置
     fix_compile_coremark #修复coremark编译
     update_dnsmasq_conf #更新dnsmasq配置
     add_backup_info_to_sysupgrade #添加备份信息到系统升级
-    # update_mosdns_deconfig #更新mosdns默认配置
+    update_mosdns_deconfig #更新mosdns默认配置
     fix_quickstart #修复快速启动
     update_oaf_deconfig #更新oaf默认配置
     # add_timecontrol #添加家长时间控制
@@ -1044,6 +1045,7 @@ main() {
     install_feeds #安装feeds
     update_adguardhome #更新adguardhome
     update_script_priority #更新脚本优先级
+    update_menu_location #更新菜单位置
     update_geoip #更新geoip
     update_package "runc" "releases" "v1.2.6" #更新runc包到v1.2.6版本
     update_package "containerd" "releases" "v1.7.27" #更新containerd包到v1.7.27版本

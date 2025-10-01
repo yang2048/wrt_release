@@ -5,6 +5,6 @@ if [ ! -f /etc/config/argon ]; then
     uci add argon global
 fi
 
-uci set argon.@global[0].primary='#07C160'
+uci set argon.@global[0].primary='#067f40'
 uci set argon.@global[0].transparency='0.3'
 uci commit argon

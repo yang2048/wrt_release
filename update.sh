@@ -1244,6 +1244,7 @@ update_mt76() {
 }
 
 fix_node_build() {
+    echo "Fix node build."
     # build node in single thread to avoid out of memory
     local node_makefile="$BUILD_DIR/feeds/packages/lang/node/Makefile"
     if [ -f "$node_makefile" ]; then
@@ -1257,6 +1258,7 @@ fix_node_build() {
 }
 
 fix_libffi() {
+    echo "Fix libffi build."
     local original_makefile="$BUILD_DIR/package/feeds/packages/libffi/Makefile"
     if [ -f "$original_makefile" ]; then
         echo "Restoring original libffi Makefile from openwrt..."
@@ -1323,7 +1325,7 @@ main() {
     update_feeds
     remove_unwanted_packages
     remove_tweaked_packages
-    update_homeproxy
+    # update_homeproxy
     fix_default_set
     fix_miniupnpd
     update_golang
@@ -1351,7 +1353,7 @@ main() {
     update_mosdns_deconfig
     fix_quickstart
     update_oaf_deconfig
-    add_timecontrol
+    # add_timecontrol
     add_gecoosac
     add_awg
     # update_lucky
@@ -1360,14 +1362,14 @@ main() {
     update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as
-    # update_argon
+    update_argon
     install_feeds
     update_adguardhome
     update_script_priority
     update_base_files
     add_ohmyzsh
-    add_nbtverify
-    # add_turboacc
+    # add_nbtverify
+    add_turboacc
     # fix_cudy_tr3000_114m
     fix_easytier
     update_geoip
@@ -1375,7 +1377,7 @@ main() {
     fix_node_build
     fix_libffi
     tailscale_use_awg
-    # update_proxy_app_menu_location
+    update_proxy_app_menu_location
     # fix_kernel_magic
     # update_mt76
 EOF

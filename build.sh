@@ -22,6 +22,12 @@ BASE_PATH=$(cd $(dirname $0) && pwd)
 Dev=$1
 Build_Mod=$2
 
+if [ -z "$Dev" ]; then
+    echo "Usage: $0 <dev_name> [build_mod]"
+    echo "或者运行 ./start.sh 进行交互式选择"
+    exit 1
+fi
+
 CONFIG_FILE="$BASE_PATH/deconfig/$Dev.config"
 INI_FILE="$BASE_PATH/compilecfg/$Dev.ini"
 
@@ -66,6 +72,9 @@ apply_config() {
 
     # 追加代理配置
     cat "$BASE_PATH/deconfig/proxy.config" >> "$BASE_PATH/$BUILD_DIR/.config"
+    
+    # 追加 AWG 配置
+    cat "$BASE_PATH/deconfig/awg.config" >> "$BASE_PATH/$BUILD_DIR/.config"
 }
 
 REPO_URL=$(read_ini_by_key "REPO_URL")
@@ -73,13 +82,17 @@ REPO_BRANCH=$(read_ini_by_key "REPO_BRANCH")
 REPO_BRANCH=${REPO_BRANCH:-main}
 BUILD_DIR=$(read_ini_by_key "BUILD_DIR")
 COMMIT_HASH=$(read_ini_by_key "COMMIT_HASH")
+DISABLED_FUNCTIONS=$(read_ini_by_key "DISABLED_FUNCTIONS")
+ENABLED_FUNCTIONS=$(read_ini_by_key "ENABLED_FUNCTIONS")
+KERNEL_VERMAGIC=$(read_ini_by_key "KERNEL_VERMAGIC")
+KERNEL_MODULES=$(read_ini_by_key "KERNEL_MODULES")
 COMMIT_HASH=${COMMIT_HASH:-none}
 
 if [[ -d $BASE_PATH/action_build ]]; then
     BUILD_DIR="action_build"
 fi
-
-$BASE_PATH/update.sh "$REPO_URL" "$REPO_BRANCH" "$BASE_PATH/$BUILD_DIR" "$COMMIT_HASH"
+chmod +x "$BASE_PATH/update.sh"
+$BASE_PATH/update.sh "$REPO_URL" "$REPO_BRANCH" "$BASE_PATH/$BUILD_DIR" "$COMMIT_HASH" "$CONFIG_FILE" "$DISABLED_FUNCTIONS" "$ENABLED_FUNCTIONS" "$KERNEL_VERMAGIC" "$KERNEL_MODULES"
 
 apply_config
 remove_uhttpd_dependency
@@ -103,10 +116,10 @@ if [[ -d $TARGET_DIR ]]; then
     find "$TARGET_DIR" -type f \( -name "*.bin" -o -name "*.manifest" -o -name "*efi.img.gz" -o -name "*.itb" -o -name "*.fip" -o -name "*.ubi" -o -name "*rootfs.tar.gz" \) -exec rm -f {} +
 fi
 
-make download -j$(($(nproc) * 2))
-make -j$(($(nproc) + 1)) || make -j1 V=s
+make download -j$(($(nproc) * 2)) || make download -j$(nproc) || make download -j1 || make download -j1 V=1 || make download -j1 V=s || exit 1
+make -j$(($(nproc) + 1)) || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=s || exit 1
 
-FIRMWARE_DIR="$BASE_PATH/firmware"
+FIRMWARE_DIR="$BASE_PATH/firmware/$BUILD_DIR"
 \rm -rf "$FIRMWARE_DIR"
 mkdir -p "$FIRMWARE_DIR"
 find "$TARGET_DIR" -type f \( -name "*.bin" -o -name "*.manifest" -o -name "*efi.img.gz" -o -name "*.itb" -o -name "*.fip" -o -name "*.ubi" -o -name "*rootfs.tar.gz" \) -exec cp -f {} "$FIRMWARE_DIR/" \;

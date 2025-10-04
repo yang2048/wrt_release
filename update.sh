@@ -144,6 +144,7 @@ update_feeds() {
     # add_feeds "node" "https://github.com/nxhack/openwrt-node-packages.git;openwrt-24.10"
     # 检查并添加 libremesh 源
     # add_feeds "libremesh" "https://github.com/libremesh/lime-packages"
+    
     # 添加bpf.mk解决更新报错
     if [ ! -f "$BUILD_DIR/include/bpf.mk" ]; then
         touch "$BUILD_DIR/include/bpf.mk"
@@ -167,7 +168,7 @@ remove_unwanted_packages() {
         "luci-app-passwall" "luci-app-ddns-go" "luci-app-rclone" "luci-app-ssr-plus"
         "luci-app-vssr" "luci-app-daed" "luci-app-dae" "luci-app-alist" "luci-app-homeproxy"
         "luci-app-haproxy-tcp" "luci-app-openclash" "luci-app-mihomo" "luci-app-appfilter"
-        "luci-app-msd_lite"
+        "luci-app-msd_lite" "luci-app-upnp" "luci-app-passwall2" "luci-app-samba4" "luci-app-easytier"
     )
     local packages_net=(
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
@@ -180,8 +181,8 @@ remove_unwanted_packages() {
         "cups"
     )
     local small8_packages=(
-        "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-theme-argon" "luci-app-argon-config"
-        "alist" "opkg"
+        "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-app-alist"
+        "alist" "opkg" "smartdns" "luci-app-smartdns"
     )
 
     for pkg in "${luci_packages[@]}"; do
@@ -266,8 +267,12 @@ install_fullconenat() {
 
 install_kiddin9() {
     echo "正在安装 kiddin9 源..."
-    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-turboacc luci-app-openclash \
-    xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin tuic-client chinadns-ng ipt2socks trojan-plus tcping simple-obfs shadowsocksr-libev luci-app-passwall2 alist luci-app-alist v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-guest-wifi luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite
+    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-openclash \
+    xray-core xray-plugin dns2tcp dns2socks hysteria naiveproxy sing-box v2ray-geodata v2ray-geoview v2ray-plugin tuic-client chinadns-ng ipt2socks trojan-plus tcping simple-obfs \
+    luci-app-passwall2 alist luci-app-alist v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store \
+    quickstart luci-app-quickstart luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale oaf open-app-filter \
+    luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite luci-app-passwall \
+    luci-app-ramfree luci-app-cpufreq luci-mod-listening-ports luci-app-socat luci-app-zerotier luci-app-upnp luci-app-samba4 luci-app-appfilter
 }
 
 # install_node() {
@@ -450,22 +455,22 @@ update_ath11k_fw() {
 
 fix_mkpkg_format_invalid() {
     if [[ $BUILD_DIR =~ "imm-nss" ]]; then
-        if [ -f $BUILD_DIR/feeds/kiddin9/v2ray-geodata/Makefile ]; then
-            sed -i 's/VER)-\$(PKG_RELEASE)/VER)-r\$(PKG_RELEASE)/g' $BUILD_DIR/feeds/kiddin9/v2ray-geodata/Makefile
+        if [ -f $BUILD_DIR/feeds/small8/v2ray-geodata/Makefile ]; then
+            sed -i 's/VER)-\$(PKG_RELEASE)/VER)-r\$(PKG_RELEASE)/g' $BUILD_DIR/feeds/small8/v2ray-geodata/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/kiddin9/luci-lib-taskd/Makefile ]; then
-            sed -i 's/>=1\.0\.3-1/>=1\.0\.3-r1/g' $BUILD_DIR/feeds/kiddin9/luci-lib-taskd/Makefile
+        if [ -f $BUILD_DIR/feeds/small8/luci-lib-taskd/Makefile ]; then
+            sed -i 's/>=1\.0\.3-1/>=1\.0\.3-r1/g' $BUILD_DIR/feeds/small8/luci-lib-taskd/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-openclash/Makefile ]; then
-            sed -i 's/PKG_RELEASE:=beta/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-openclash/Makefile
+        if [ -f $BUILD_DIR/feeds/small8/luci-app-openclash/Makefile ]; then
+            sed -i 's/PKG_RELEASE:=beta/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-openclash/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile ]; then
-            sed -i 's/PKG_VERSION:=0\.8\.16-1/PKG_VERSION:=0\.8\.16/g' $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile
-            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile
+        if [ -f $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile ]; then
+            sed -i 's/PKG_VERSION:=0\.8\.16-1/PKG_VERSION:=0\.8\.16/g' $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile
+            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile ]; then
-            sed -i 's/PKG_VERSION:=0\.1\.27-1/PKG_VERSION:=0\.1\.27/g' $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile
-            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile
+        if [ -f $BUILD_DIR/feeds/small8/luci-app-store/Makefile ]; then
+            sed -i 's/PKG_VERSION:=0\.1\.27-1/PKG_VERSION:=0\.1\.27/g' $BUILD_DIR/feeds/small8/luci-app-store/Makefile
+            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-store/Makefile
         fi
     fi
 }
@@ -514,7 +519,7 @@ change_cpuusage() {
 }
 
 update_tcping() {
-    local tcping_path="$BUILD_DIR/feeds/kiddin9/tcping/Makefile"
+    local tcping_path="$BUILD_DIR/feeds/small8/tcping/Makefile"
     local url="https://raw.githubusercontent.com/xiaorouji/openwrt-passwall-packages/refs/heads/main/tcping/Makefile"
 
     if [ -d "$(dirname "$tcping_path")" ]; then
@@ -562,13 +567,13 @@ EOF
 # 应用 Passwall 相关调整
 apply_passwall_tweaks() {
     # 清理 Passwall 的 chnlist 规则文件
-    local chnlist_path="$BUILD_DIR/feeds/kiddin9/luci-app-passwall/root/usr/share/passwall/rules/chnlist"
+    local chnlist_path="$BUILD_DIR/feeds/small8/luci-app-passwall/root/usr/share/passwall/rules/chnlist"
     if [ -f "$chnlist_path" ]; then
         >"$chnlist_path"
     fi
 
     # 调整 Xray 最大 RTT 和 保留记录数量
-    local xray_util_path="$BUILD_DIR/feeds/kiddin9/luci-app-passwall/luasrc/passwall/util_xray.lua"
+    local xray_util_path="$BUILD_DIR/feeds/small8/luci-app-passwall/luasrc/passwall/util_xray.lua"
     if [ -f "$xray_util_path" ]; then
         sed -i 's/maxRTT = "1s"/maxRTT = "2s"/g' "$xray_util_path"
         sed -i 's/sampling = 3/sampling = 5/g' "$xray_util_path"
@@ -629,7 +634,7 @@ update_menu_location() {
         sed -i 's/nas/services/g' "$samba4_path"
     fi
 
-    local tailscale_path="$BUILD_DIR/feeds/kiddin9/luci-app-tailscale/root/usr/share/luci/menu.d/luci-app-tailscale.json"
+    local tailscale_path="$BUILD_DIR/feeds/small8/luci-app-tailscale/root/usr/share/luci/menu.d/luci-app-tailscale.json"
     if [ -d "$(dirname "$tailscale_path")" ] && [ -f "$tailscale_path" ]; then
         sed -i 's/services/vpn/g' "$tailscale_path"
     fi
@@ -644,7 +649,7 @@ fix_compile_coremark() {
 
 update_homeproxy() {
     local repo_url="https://github.com/immortalwrt/homeproxy.git"
-    local target_dir="$BUILD_DIR/feeds/kiddin9/luci-app-homeproxy"
+    local target_dir="$BUILD_DIR/feeds/small8/luci-app-homeproxy"
 
     if [ -d "$target_dir" ]; then
         echo "正在更新 homeproxy..."
@@ -781,6 +786,7 @@ function update_script_priority() {
 update_mosdns_deconfig() {
     local mosdns_conf="$BUILD_DIR/feeds/kiddin9/luci-app-mosdns/root/etc/config/mosdns"
     if [ -d "${mosdns_conf%/*}" ] && [ -f "$mosdns_conf" ]; then
+        # 修改mosdns的cache_size和listen_port
         sed -i 's/8000/300/g' "$mosdns_conf"
         sed -i 's/5335/5336/g' "$mosdns_conf"
     fi
@@ -861,10 +867,6 @@ add_awg() {
         echo "错误：从 $repo_url 克隆 awg-openwrt 仓库失败" >&2
         exit 1
     fi
-
-    # cd "$BUILD_DIR"
-    # sh <(wget -O - https://raw.githubusercontent.com/Slava-Shchipunov/awg-openwrt/refs/heads/master/amneziawg-install.sh)
-    # cd -
 }
 
 update_proxy_app_menu_location() {
@@ -910,14 +912,6 @@ update_adguardhome() {
     if ! git clone --depth 1 "$repo_url" "$adguardhome_dir"; then
         echo "错误：从 $repo_url 克隆 luci-app-adguardhome 仓库失败" >&2
         exit 1
-    fi
-}
-
-
-fix_easytier() {
-    local easytier_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-easytier/luasrc/model/cbi/easytier.lua"
-    if [ -d "${easytier_path%/*}" ] && [ -f "$easytier_path" ]; then
-        sed -i 's/util/xml/g' "$easytier_path"
     fi
 }
 
@@ -979,6 +973,13 @@ update_lucky() {
     fi
 }
 
+fix_easytier() {
+    local easytier_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-easytier/luasrc/model/cbi/easytier.lua"
+    if [ -d "${easytier_path%/*}" ] && [ -f "$easytier_path" ]; then
+        sed -i 's/util/xml/g' "$easytier_path"
+    fi
+}
+
 fix_rust_compile_error() {
     if [ -f "$BUILD_DIR/feeds/packages/lang/rust/Makefile" ]; then
         sed -i 's/download-ci-llvm=true/download-ci-llvm=false/g' "$BUILD_DIR/feeds/packages/lang/rust/Makefile"
@@ -1012,54 +1013,6 @@ update_diskman() {
         sed -i 's/fs-ntfs /fs-ntfs3 /g' "$path/Makefile"
         sed -i '/ntfs-3g-utils /d' "$path/Makefile"
     fi
-}
-
-update_uwsgi_limit_as() {
-    # 更新 uwsgi 的 limit-as 配置，将其值更改为 8192
-    local cgi_io_ini="$BUILD_DIR/feeds/packages/net/uwsgi/files-luci-support/luci-cgi_io.ini"
-    local webui_ini="$BUILD_DIR/feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini"
-
-    if [ -f "$cgi_io_ini" ]; then
-        # 将 luci-cgi_io.ini 文件中的 limit-as 值更新为 8192
-        sed -i 's/^limit-as = .*/limit-as = 8192/g' "$cgi_io_ini"
-    fi
-
-    if [ -f "$webui_ini" ]; then
-        # 将 luci-webui.ini 文件中的 limit-as 值更新为 8192
-        sed -i 's/^limit-as = .*/limit-as = 8192/g' "$webui_ini"
-    fi
-}
-
-remove_tweaked_packages() {
-    local target_mk="$BUILD_DIR/include/target.mk"
-    if [ -f "$target_mk" ]; then
-        # 检查目标行是否未被注释
-        if grep -q "^DEFAULT_PACKAGES += \$(DEFAULT_PACKAGES.tweak)" "$target_mk"; then
-            # 如果未被注释，则添加注释
-            sed -i 's/DEFAULT_PACKAGES += $(DEFAULT_PACKAGES.tweak)/# DEFAULT_PACKAGES += $(DEFAULT_PACKAGES.tweak)/g' "$target_mk"
-        fi
-    fi
-}
-
-update_argon() {
-    local repo_url="https://github.com/ZqinKing/luci-theme-argon.git"
-    local dst_theme_path="$BUILD_DIR/feeds/luci/themes/luci-theme-argon"
-    local tmp_dir
-    tmp_dir=$(mktemp -d)
-
-    echo "正在更新 argon 主题..."
-
-    if ! git clone --depth 1 "$repo_url" "$tmp_dir"; then
-        echo "错误：从 $repo_url 克隆 argon 主题仓库失败" >&2
-        rm -rf "$tmp_dir"
-        exit 1
-    fi
-
-    rm -rf "$dst_theme_path"
-    rm -rf "$tmp_dir/.git"
-    mv "$tmp_dir" "$dst_theme_path"
-
-    echo "luci-theme-argon 更新完成"
 }
 
 add_quickfile() {
@@ -1127,6 +1080,54 @@ EOF
     fi
 }
 
+update_uwsgi_limit_as() {
+    # 更新 uwsgi 的 limit-as 配置，将其值更改为 8192
+    local cgi_io_ini="$BUILD_DIR/feeds/packages/net/uwsgi/files-luci-support/luci-cgi_io.ini"
+    local webui_ini="$BUILD_DIR/feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini"
+
+    if [ -f "$cgi_io_ini" ]; then
+        # 将 luci-cgi_io.ini 文件中的 limit-as 值更新为 8192
+        sed -i 's/^limit-as = .*/limit-as = 8192/g' "$cgi_io_ini"
+    fi
+
+    if [ -f "$webui_ini" ]; then
+        # 将 luci-webui.ini 文件中的 limit-as 值更新为 8192
+        sed -i 's/^limit-as = .*/limit-as = 8192/g' "$webui_ini"
+    fi
+}
+
+remove_tweaked_packages() {
+    local target_mk="$BUILD_DIR/include/target.mk"
+    if [ -f "$target_mk" ]; then
+        # 检查目标行是否未被注释
+        if grep -q "^DEFAULT_PACKAGES += \$(DEFAULT_PACKAGES.tweak)" "$target_mk"; then
+            # 如果未被注释，则添加注释
+            sed -i 's/DEFAULT_PACKAGES += $(DEFAULT_PACKAGES.tweak)/# DEFAULT_PACKAGES += $(DEFAULT_PACKAGES.tweak)/g' "$target_mk"
+        fi
+    fi
+}
+
+update_argon() {
+    local repo_url="https://github.com/ZqinKing/luci-theme-argon.git"
+    local dst_theme_path="$BUILD_DIR/feeds/luci/themes/luci-theme-argon"
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+
+    echo "正在更新 argon 主题..."
+
+    if ! git clone --depth 1 "$repo_url" "$tmp_dir"; then
+        echo "错误：从 $repo_url 克隆 argon 主题仓库失败" >&2
+        rm -rf "$tmp_dir"
+        exit 1
+    fi
+
+    rm -rf "$dst_theme_path"
+    rm -rf "$tmp_dir/.git"
+    mv "$tmp_dir" "$dst_theme_path"
+
+    echo "luci-theme-argon 更新完成"
+}
+
 update_base_files() {
     local base_files_path="$BUILD_DIR/package/base-files/files"
     local uci_defaults_path="$base_files_path/etc/uci-defaults"
@@ -1171,13 +1172,6 @@ add_nbtverify() {
         echo "[nbtverify] Unsupported architecture: $arch"
         return
     fi
-}
-
-add_turboacc() {
-    cd "$BUILD_DIR"
-    curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh
-    bash add_turboacc.sh --no-sfe
-    cd -
 }
 
 fix_cudy_tr3000_114m() {
@@ -1330,7 +1324,7 @@ main() {
     update_feeds
     remove_unwanted_packages
     remove_tweaked_packages
-    update_homeproxy
+    # update_homeproxy
     fix_default_set
     fix_miniupnpd
     update_golang
@@ -1343,10 +1337,10 @@ main() {
     update_ath11k_fw
     # fix_mkpkg_format_invalid
     # change_cpuusage
-    update_tcping
+    # update_tcping
     # add_ax6600_led
     set_custom_task
-    # apply_passwall_tweaks
+    # apply_passwall_tweaks #应用 Passwall 相关调整
     install_opkg_distfeeds
     update_nss_pbuf_performance
     set_build_signature
@@ -1356,7 +1350,7 @@ main() {
     update_dnsmasq_conf
     add_backup_info_to_sysupgrade
     update_mosdns_deconfig
-    fix_quickstart
+    # fix_quickstart
     update_oaf_deconfig
     # add_timecontrol
     add_gecoosac
@@ -1364,7 +1358,7 @@ main() {
     # update_lucky
     add_quickfile
     fix_rust_compile_error
-    update_diskman
+    # update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as
     update_argon
@@ -1376,16 +1370,16 @@ main() {
     # add_nbtverify
     # add_turboacc
     # fix_cudy_tr3000_114m
-    fix_easytier
+    # fix_easytier
     update_geoip
     update_packages
-    fix_node_build
+    # fix_node_build
     fix_libffi
     # tailscale_use_awg
     # update_proxy_app_menu_location
     # fix_kernel_magic
     # update_mt76
-    apply_hash_fixes
+    apply_hash_fixes # 调用哈希修正函数
 EOF
 }
 

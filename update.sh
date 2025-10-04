@@ -1341,9 +1341,9 @@ main() {
     update_affinity_script
     update_ath11k_fw
     # fix_mkpkg_format_invalid
-    change_cpuusage
+    # change_cpuusage
     update_tcping
-    add_ax6600_led
+    # add_ax6600_led
     set_custom_task
     apply_passwall_tweaks
     install_opkg_distfeeds
@@ -1373,7 +1373,7 @@ main() {
     update_base_files
     add_ohmyzsh
     # add_nbtverify
-    add_turboacc
+    # add_turboacc
     # fix_cudy_tr3000_114m
     fix_easytier
     update_geoip
@@ -1381,7 +1381,7 @@ main() {
     fix_node_build
     fix_libffi
     # tailscale_use_awg
-    update_proxy_app_menu_location
+    # update_proxy_app_menu_location
     # fix_kernel_magic
     # update_mt76
 EOF

@@ -122,7 +122,6 @@ make download -j$(($(nproc) * 2)) || make download -j$(nproc) || make download -
 echo "并行编译 >>  ..."
 make -j$(($(nproc) + 1)) || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=s || exit 1
 
-echo "生成固件 >>  ..."
 FIRMWARE_DIR="$BASE_PATH/firmware/$BUILD_DIR"
 \rm -rf "$FIRMWARE_DIR"
 mkdir -p "$FIRMWARE_DIR"

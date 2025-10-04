@@ -133,11 +133,11 @@ update_feeds() {
         fi
     }
     # 检查并添加 small-package 源
-    add_feeds "small8" "https://github.com/kenzok8/small-package"
+    # add_feeds "small8" "https://github.com/kenzok8/small-package"
     # 检查并添加 kwrt 源
     add_feeds "kiddin9" "https://github.com/kiddin9/kwrt-packages.git"
     # 检查并添加 AWG-OpenWRT 源
-    add_feeds "awg" "https://github.com/Slava-Shchipunov/awg-openwrt"
+    # add_feeds "awg" "https://github.com/Slava-Shchipunov/awg-openwrt"
     # 检查并添加 opentopd 源
     # add_feeds "opentopd" "https://github.com/sirpdboy/sirpdboy-package"
     # 检查并添加 node 源
@@ -266,7 +266,8 @@ install_fullconenat() {
 
 install_kiddin9() {
     echo "正在安装 kiddin9 源..."
-    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-turboacc luci-app-openclash
+    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-turboacc luci-app-openclash \
+    xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev luci-app-passwall2 alist luci-app-alist v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-guest-wifi luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite
 }
 
 # install_node() {
@@ -449,22 +450,22 @@ update_ath11k_fw() {
 
 fix_mkpkg_format_invalid() {
     if [[ $BUILD_DIR =~ "imm-nss" ]]; then
-        if [ -f $BUILD_DIR/feeds/small8/v2ray-geodata/Makefile ]; then
-            sed -i 's/VER)-\$(PKG_RELEASE)/VER)-r\$(PKG_RELEASE)/g' $BUILD_DIR/feeds/small8/v2ray-geodata/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/v2ray-geodata/Makefile ]; then
+            sed -i 's/VER)-\$(PKG_RELEASE)/VER)-r\$(PKG_RELEASE)/g' $BUILD_DIR/feeds/kiddin9/v2ray-geodata/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-lib-taskd/Makefile ]; then
-            sed -i 's/>=1\.0\.3-1/>=1\.0\.3-r1/g' $BUILD_DIR/feeds/small8/luci-lib-taskd/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-lib-taskd/Makefile ]; then
+            sed -i 's/>=1\.0\.3-1/>=1\.0\.3-r1/g' $BUILD_DIR/feeds/kiddin9/luci-lib-taskd/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-app-openclash/Makefile ]; then
-            sed -i 's/PKG_RELEASE:=beta/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-openclash/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-openclash/Makefile ]; then
+            sed -i 's/PKG_RELEASE:=beta/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-openclash/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile ]; then
-            sed -i 's/PKG_VERSION:=0\.8\.16-1/PKG_VERSION:=0\.8\.16/g' $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile
-            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile ]; then
+            sed -i 's/PKG_VERSION:=0\.8\.16-1/PKG_VERSION:=0\.8\.16/g' $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile
+            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-app-store/Makefile ]; then
-            sed -i 's/PKG_VERSION:=0\.1\.27-1/PKG_VERSION:=0\.1\.27/g' $BUILD_DIR/feeds/small8/luci-app-store/Makefile
-            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-store/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile ]; then
+            sed -i 's/PKG_VERSION:=0\.1\.27-1/PKG_VERSION:=0\.1\.27/g' $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile
+            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile
         fi
     fi
 }
@@ -513,7 +514,7 @@ change_cpuusage() {
 }
 
 update_tcping() {
-    local tcping_path="$BUILD_DIR/feeds/small8/tcping/Makefile"
+    local tcping_path="$BUILD_DIR/feeds/kiddin9/tcping/Makefile"
     local url="https://raw.githubusercontent.com/xiaorouji/openwrt-passwall-packages/refs/heads/main/tcping/Makefile"
 
     if [ -d "$(dirname "$tcping_path")" ]; then
@@ -561,13 +562,13 @@ EOF
 # 应用 Passwall 相关调整
 apply_passwall_tweaks() {
     # 清理 Passwall 的 chnlist 规则文件
-    local chnlist_path="$BUILD_DIR/feeds/small8/luci-app-passwall/root/usr/share/passwall/rules/chnlist"
+    local chnlist_path="$BUILD_DIR/feeds/kiddin9/luci-app-passwall/root/usr/share/passwall/rules/chnlist"
     if [ -f "$chnlist_path" ]; then
         >"$chnlist_path"
     fi
 
     # 调整 Xray 最大 RTT 和 保留记录数量
-    local xray_util_path="$BUILD_DIR/feeds/small8/luci-app-passwall/luasrc/passwall/util_xray.lua"
+    local xray_util_path="$BUILD_DIR/feeds/kiddin9/luci-app-passwall/luasrc/passwall/util_xray.lua"
     if [ -f "$xray_util_path" ]; then
         sed -i 's/maxRTT = "1s"/maxRTT = "2s"/g' "$xray_util_path"
         sed -i 's/sampling = 3/sampling = 5/g' "$xray_util_path"
@@ -628,7 +629,7 @@ update_menu_location() {
         sed -i 's/nas/services/g' "$samba4_path"
     fi
 
-    local tailscale_path="$BUILD_DIR/feeds/small8/luci-app-tailscale/root/usr/share/luci/menu.d/luci-app-tailscale.json"
+    local tailscale_path="$BUILD_DIR/feeds/kiddin9/luci-app-tailscale/root/usr/share/luci/menu.d/luci-app-tailscale.json"
     if [ -d "$(dirname "$tailscale_path")" ] && [ -f "$tailscale_path" ]; then
         sed -i 's/services/vpn/g' "$tailscale_path"
     fi
@@ -643,7 +644,7 @@ fix_compile_coremark() {
 
 update_homeproxy() {
     local repo_url="https://github.com/immortalwrt/homeproxy.git"
-    local target_dir="$BUILD_DIR/feeds/small8/luci-app-homeproxy"
+    local target_dir="$BUILD_DIR/feeds/kiddin9/luci-app-homeproxy"
 
     if [ -d "$target_dir" ]; then
         echo "正在更新 homeproxy..."
@@ -771,14 +772,14 @@ function update_script_priority() {
     fi
 
     # 更新mosdns服务的启动顺序
-    local mosdns_path="$BUILD_DIR/package/feeds/small8/luci-app-mosdns/root/etc/init.d/mosdns"
+    local mosdns_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-mosdns/root/etc/init.d/mosdns"
     if [ -d "${mosdns_path%/*}" ] && [ -f "$mosdns_path" ]; then
         sed -i 's/START=.*/START=94/g' "$mosdns_path"
     fi
 }
 
 update_mosdns_deconfig() {
-    local mosdns_conf="$BUILD_DIR/feeds/small8/luci-app-mosdns/root/etc/config/mosdns"
+    local mosdns_conf="$BUILD_DIR/feeds/kiddin9/luci-app-mosdns/root/etc/config/mosdns"
     if [ -d "${mosdns_conf%/*}" ] && [ -f "$mosdns_conf" ]; then
         sed -i 's/8000/300/g' "$mosdns_conf"
         sed -i 's/5335/5336/g' "$mosdns_conf"
@@ -786,7 +787,7 @@ update_mosdns_deconfig() {
 }
 
 fix_quickstart() {
-    local file_path="$BUILD_DIR/feeds/small8/luci-app-quickstart/luasrc/controller/istore_backend.lua"
+    local file_path="$BUILD_DIR/feeds/kiddin9/luci-app-quickstart/luasrc/controller/istore_backend.lua"
     local url="https://gist.githubusercontent.com/puteulanus/1c180fae6bccd25e57eb6d30b7aa28aa/raw/istore_backend.lua"
     # 下载新的istore_backend.lua文件并覆盖
     if [ -f "$file_path" ]; then
@@ -799,9 +800,9 @@ fix_quickstart() {
 }
 
 update_oaf_deconfig() {
-    local conf_path="$BUILD_DIR/feeds/small8/open-app-filter/files/appfilter.config"
-    local uci_def="$BUILD_DIR/feeds/small8/luci-app-oaf/root/etc/uci-defaults/94_feature_3.0"
-    local disable_path="$BUILD_DIR/feeds/small8/luci-app-oaf/root/etc/uci-defaults/99_disable_oaf"
+    local conf_path="$BUILD_DIR/feeds/kiddin9/open-app-filter/files/appfilter.config"
+    local uci_def="$BUILD_DIR/feeds/kiddin9/luci-app-oaf/root/etc/uci-defaults/94_feature_3.0"
+    local disable_path="$BUILD_DIR/feeds/kiddin9/luci-app-oaf/root/etc/uci-defaults/99_disable_oaf"
 
     if [ -d "${conf_path%/*}" ] && [ -f "$conf_path" ]; then
         sed -i \
@@ -868,7 +869,7 @@ add_awg() {
 
 update_proxy_app_menu_location() {
     # passwall
-    local passwall_path="$BUILD_DIR/package/feeds/small8/luci-app-passwall/luasrc/controller/passwall.lua"
+    local passwall_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-passwall/luasrc/controller/passwall.lua"
     if [ -d "${passwall_path%/*}" ] && [ -f "$passwall_path" ]; then
         local pos=$(grep -n "entry" "$passwall_path" | head -n 1 | awk -F ":" '{print $1}')
         if [ -n "$pos" ]; then
@@ -877,7 +878,7 @@ update_proxy_app_menu_location() {
         fi
     fi
     # passwall2
-    local passwall2_path="$BUILD_DIR/package/feeds/small8/luci-app-passwall2/luasrc/controller/passwall2.lua"
+    local passwall2_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-passwall2/luasrc/controller/passwall2.lua"
     if [ -d "${passwall2_path%/*}" ] && [ -f "$passwall2_path" ]; then
         local pos=$(grep -n "entry" "$passwall2_path" | head -n 1 | awk -F ":" '{print $1}')
         if [ -n $pos ]; then
@@ -887,20 +888,20 @@ update_proxy_app_menu_location() {
     fi
 
     # homeproxy
-    local homeproxy_path="$BUILD_DIR/package/feeds/small8/luci-app-homeproxy/root/usr/share/luci/menu.d/luci-app-homeproxy.json"
+    local homeproxy_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-homeproxy/root/usr/share/luci/menu.d/luci-app-homeproxy.json"
     if [ -d "${homeproxy_path%/*}" ] && [ -f "$homeproxy_path" ]; then
         sed -i 's/\/services\//\/proxy\//g' "$homeproxy_path"
     fi
 
     # nikki
-    local nikki_path="$BUILD_DIR/package/feeds/small8/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json"
+    local nikki_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json"
     if [ -d "${nikki_path%/*}" ] && [ -f "$nikki_path" ]; then
         sed -i 's/\/services\//\/proxy\//g' "$nikki_path"
     fi
 }
 
 update_adguardhome() {
-    local adguardhome_dir="$BUILD_DIR/package/feeds/small8/luci-app-adguardhome"
+    local adguardhome_dir="$BUILD_DIR/package/feeds/kiddin9/luci-app-adguardhome"
     local repo_url="https://github.com/ZqinKing/luci-app-adguardhome.git"
 
     echo "正在更新 luci-app-adguardhome..."
@@ -914,14 +915,14 @@ update_adguardhome() {
 
 
 fix_easytier() {
-    local easytier_path="$BUILD_DIR/package/feeds/small8/luci-app-easytier/luasrc/model/cbi/easytier.lua"
+    local easytier_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-easytier/luasrc/model/cbi/easytier.lua"
     if [ -d "${easytier_path%/*}" ] && [ -f "$easytier_path" ]; then
         sed -i 's/util/xml/g' "$easytier_path"
     fi
 }
 
 update_geoip() {
-    local geodata_path="$BUILD_DIR/package/feeds/small8/v2ray-geodata/Makefile"
+    local geodata_path="$BUILD_DIR/package/feeds/kiddin9/v2ray-geodata/Makefile"
     if [ -d "${geodata_path%/*}" ] && [ -f "$geodata_path" ]; then
         local GEOIP_VER=$(awk -F"=" '/GEOIP_VER:=/ {print $NF}' $geodata_path | grep -oE "[0-9]{1,}")
         if [ -n "$GEOIP_VER" ]; then
@@ -957,7 +958,7 @@ update_lucky() {
         return 1
     fi
 
-    local makefile_path="$BUILD_DIR/feeds/small8/lucky/Makefile"
+    local makefile_path="$BUILD_DIR/feeds/kiddin9/lucky/Makefile"
     if [ ! -f "$makefile_path" ]; then
         echo "Warning: lucky Makefile not found. Skipping." >&2
         return 1
@@ -1272,7 +1273,7 @@ fix_libffi() {
 }
 
 tailscale_use_awg() {
-    local tailscale_makefile="$BUILD_DIR/package/feeds/small8/tailscale/Makefile"
+    local tailscale_makefile="$BUILD_DIR/package/feeds/kiddin9/tailscale/Makefile"
     sed -i 's|^PKG_SOURCE_URL:=.*|PKG_SOURCE_URL:=https://codeload.github.com/LiuTangLei/tailscale/tar.gz/v$(PKG_VERSION)?|' "$tailscale_makefile"
     update_package "tailscale" "releases" "v1.88.2" || exit 1
 }
@@ -1329,7 +1330,7 @@ main() {
     update_feeds
     remove_unwanted_packages
     remove_tweaked_packages
-    # update_homeproxy
+    update_homeproxy
     fix_default_set
     fix_miniupnpd
     update_golang
@@ -1342,10 +1343,10 @@ main() {
     update_ath11k_fw
     # fix_mkpkg_format_invalid
     # change_cpuusage
-    update_tcping
+    # update_tcping
     # add_ax6600_led
     set_custom_task
-    apply_passwall_tweaks
+    # apply_passwall_tweaks
     install_opkg_distfeeds
     update_nss_pbuf_performance
     set_build_signature
@@ -1373,7 +1374,7 @@ main() {
     update_base_files
     add_ohmyzsh
     # add_nbtverify
-    # add_turboacc
+    add_turboacc
     # fix_cudy_tr3000_114m
     fix_easytier
     update_geoip
@@ -1384,6 +1385,7 @@ main() {
     # update_proxy_app_menu_location
     # fix_kernel_magic
     # update_mt76
+    apply_hash_fixes
 EOF
 }
 

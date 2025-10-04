@@ -36,8 +36,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      # - name: Free disk space
-      #   uses: sbwml/actions@free-disk
+      - name: Free disk space
+        uses: sbwml/actions@free-disk
 
       - name: Build System Setup
         run: |

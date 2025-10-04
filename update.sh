@@ -1359,7 +1359,7 @@ main() {
     update_oaf_deconfig
     # add_timecontrol
     add_gecoosac
-    add_awg
+    # add_awg
     # update_lucky
     add_quickfile
     fix_rust_compile_error
@@ -1380,7 +1380,7 @@ main() {
     update_packages
     fix_node_build
     fix_libffi
-    tailscale_use_awg
+    # tailscale_use_awg
     update_proxy_app_menu_location
     # fix_kernel_magic
     # update_mt76

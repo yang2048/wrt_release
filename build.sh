@@ -74,7 +74,7 @@ apply_config() {
     cat "$BASE_PATH/deconfig/proxy.config" >> "$BASE_PATH/$BUILD_DIR/.config"
     
     # 追加 AWG 配置
-    cat "$BASE_PATH/deconfig/awg.config" >> "$BASE_PATH/$BUILD_DIR/.config"
+    # cat "$BASE_PATH/deconfig/awg.config" >> "$BASE_PATH/$BUILD_DIR/.config"
 }
 
 REPO_URL=$(read_ini_by_key "REPO_URL")
@@ -120,7 +120,7 @@ fi
 echo "并行下载 >>  线程数逐步递减"
 make download -j$(($(nproc) * 2)) || make download -j$(nproc) || make download -j1 || make download -j1 V=1 || make download -j1 V=s || exit 1
 echo "并行编译 >>  ..."
-make -j$(($(nproc) + 1)) || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=sc || exit 1
+make -j$(($(nproc) + 1)) || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=s || exit 1
 
 echo "生成固件 >>  ..."
 FIRMWARE_DIR="$BASE_PATH/firmware/$BUILD_DIR"

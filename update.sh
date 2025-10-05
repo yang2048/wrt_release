@@ -288,9 +288,9 @@ install_kiddin9() {
     ./scripts/feeds install -p kiddin9 -f tcping v2dat luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare \
     luci-app-passwall2 alist luci-app-alist mosdns luci-app-mosdns ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd \
     luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky \
-    luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki tailscale luci-app-tailscale oaf luci-app-oaf open-app-filter\
+    luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale oaf luci-app-oaf open-app-filter\
     luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-guest-wifi luci-app-wolplus wrtbwmon luci-app-wrtbwmon \
-    msd_lite luci-app-msd_lite
+    msd_lite luci-app-msd_lite 
 
 }
 
@@ -761,9 +761,9 @@ update_package() {
 update_packages() {
     update_package "runc" "releases" "v1.3.0" || exit 1
     update_package "containerd" "releases" "v1.7.28" || exit 1
-    update_package "docker" "tags" "v28.4.0" || exit 1
-    update_package "dockerd" "releases" "v28.4.0" || exit 1
-    update_package "docker-compose" "releases" "v2.39.4" || exit 1
+    # update_package "docker" "tags" "v28.4.0" || exit 1
+    # update_package "dockerd" "releases" "v28.4.0" || exit 1
+    # update_package "docker-compose" "releases" "v2.39.4" || exit 1
 }
 
 # 添加系统升级时的备份信息

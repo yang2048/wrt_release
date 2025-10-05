@@ -271,11 +271,16 @@ install_fullconenat() {
 
 install_kiddin9() {
     echo "正在安装 kiddin9 源..."
-    ./scripts/feeds install -p kiddin9 -f ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store luci-app-passwall2 alist luci-app-alist \
-    quickstart luci-app-quickstart luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale oaf open-app-filter \
-    luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite \
-    luci-app-ramfree luci-app-cpufreq luci-mod-listening-ports luci-app-socat luci-app-zerotier luci-app-upnp luci-app-samba4 \
-    luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-openclash
+    # ./scripts/feeds install -p kiddin9 -f ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store luci-app-passwall2 alist luci-app-alist \
+    # quickstart luci-app-quickstart luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale oaf open-app-filter \
+    # luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite \
+    # luci-app-ramfree luci-app-cpufreq luci-mod-listening-ports luci-app-socat luci-app-zerotier luci-app-upnp luci-app-samba4 \
+    # luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-openclash
+
+    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare \
+    ddns-go luci-app-ddns-go luci-lib-xterm taskd luci-lib-taskd luci-app-store luci-app-passwall2 quickstart luci-app-quickstart \
+    luci-theme-argon netdata luci-app-netdata luci-app-bandix easytier luci-app-easytieropen-app-filter luci-app-samba4 \
+    luci-app-zerotier luci-app-upnpwrtbwmon luci-app-wrtbwmon
 }
 
 # install_node() {
@@ -1340,7 +1345,7 @@ main() {
     update_ath11k_fw
     # fix_mkpkg_format_invalid
     # change_cpuusage
-    # update_tcping
+    update_tcping
     # add_ax6600_led
     set_custom_task
     # apply_passwall_tweaks #应用 Passwall 相关调整

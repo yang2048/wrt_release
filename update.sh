@@ -246,11 +246,11 @@ update_golang() {
 install_small8() {
     echo "正在安装 small8 源..."
     # string.Join(" ","""_""".Replace("\r", "").Split("\n"))
-    # ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev luci-app-passwall luci-app-passwall2 alist luci-app-alist v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-guest-wifi luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite
-    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
-        naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-plugin \
-        tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
-        v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome luci-app-appfilter
+    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev luci-app-passwall luci-app-passwall2 alist luci-app-alist v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-guest-wifi luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite
+    # ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
+    #     naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-plugin \
+    #     tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
+    #     v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome luci-app-appfilter
 }
 
 install_fullconenat() {
@@ -277,10 +277,13 @@ install_kiddin9() {
     # luci-app-ramfree luci-app-cpufreq luci-mod-listening-ports luci-app-socat luci-app-zerotier luci-app-upnp luci-app-samba4 \
     # luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-openclash
 
-    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare \
-    ddns-go luci-app-ddns-go luci-lib-xterm taskd luci-lib-taskd luci-app-store luci-app-passwall2 quickstart luci-app-quickstart \
-    luci-theme-argon netdata luci-app-netdata luci-app-bandix easytier luci-app-easytieropen-app-filter luci-app-samba4 \
-    luci-app-zerotier luci-app-upnpwrtbwmon luci-app-wrtbwmon
+    # ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare \
+    # ddns-go luci-app-ddns-go luci-lib-xterm taskd luci-lib-taskd luci-app-store luci-app-passwall2 quickstart luci-app-quickstart \
+    # luci-theme-argon netdata luci-app-netdata luci-app-bandix easytier luci-app-easytieropen-app-filter luci-app-samba4 \
+    # luci-app-zerotier luci-app-upnpwrtbwmon luci-app-wrtbwmon
+
+    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus luci-app-change-mac cdnspeedtest luci-app-cloudflarespeedtest qosmate luci-app-qosmate luci-app-unishare unishare
+
 }
 
 # install_node() {

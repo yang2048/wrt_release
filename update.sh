@@ -286,11 +286,9 @@ install_kiddin9() {
     # luci-app-zerotier luci-app-upnpwrtbwmon luci-app-wrtbwmon
 
     ./scripts/feeds install -p kiddin9 -f tcping v2dat luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare \
-    luci-app-passwall2 alist luci-app-alist mosdns luci-app-mosdns ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd \
-    luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky \
-    luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale oaf luci-app-oaf open-app-filter\
-    luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-guest-wifi luci-app-wolplus wrtbwmon luci-app-wrtbwmon \
-    msd_lite luci-app-msd_lite 
+    alist luci-app-alist mosdns luci-app-mosdns ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd \
+    luci-app-store quickstart luci-app-quickstart luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky \
+    luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale
 
 }
 

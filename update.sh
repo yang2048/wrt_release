@@ -747,11 +747,10 @@ update_package() {
         fi
 
         local old_version=$(awk -F"=" '/PKG_VERSION:=/ {print $NF}' "$mk_path" | grep -oE "[\.0-9]{1,}")
-        echo "当前版本: $old_version, 目标版本: $PKG_VER"
         sed -i 's/^PKG_VERSION:=.*/PKG_VERSION:='$PKG_VER'/g' "$mk_path"
         sed -i 's/^PKG_HASH:=.*/PKG_HASH:='$PKG_HASH'/g' "$mk_path"
 
-        echo "更新软件包 $1 到 $PKG_VER $PKG_HASH"
+        echo "更新软件包 $1 当前版本: $old_version, 目标版本: $PKG_VER HASH: $PKG_HASH"
     else
         echo "错误：未找到 $1 的 Makefile" >&2
         return 1
@@ -759,10 +758,10 @@ update_package() {
 }
 
 update_packages() {
-    update_package "runc" "releases" "v1.3.0" || exit 1
-    update_package "containerd" "releases" "v1.7.28" || exit 1
-    # update_package "docker" "tags" "v28.2.2" || exit 1
-    # update_package "dockerd" "releases" "v28.2.2" || exit 1
+    update_package "runc" "releases" "v1.2.6" || exit 1
+    update_package "containerd" "releases" "v1.7.27" || exit 1
+    update_package "docker" "tags" "v28.2.2" || exit 1
+    update_package "dockerd" "releases" "v28.2.2" || exit 1
     # update_package "docker-compose" "releases" "v2.36.2" || exit 1
 }
 

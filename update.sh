@@ -133,7 +133,7 @@ update_feeds() {
         fi
     }
     # 检查并添加 small-package 源
-    # add_feeds "small8" "https://github.com/kenzok8/small-package"
+    add_feeds "small8" "https://github.com/kenzok8/small-package"
     # 检查并添加 kwrt 源
     add_feeds "kiddin9" "https://github.com/kiddin9/kwrt-packages.git"
     # 检查并添加 AWG-OpenWRT 源
@@ -248,14 +248,9 @@ install_small8() {
     # string.Join(" ","""_""".Replace("\r", "").Split("\n"))
     # ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev luci-app-passwall luci-app-passwall2 alist luci-app-alist v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-guest-wifi luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite
     ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
-        naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
+        naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-plugin \
         tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
-        luci-app-passwall v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go \
-        luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart \
-        luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest netdata luci-app-netdata \
-        lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki \
-        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
-        msd_lite luci-app-msd_lite cups luci-app-cupsd
+        v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome luci-app-appfilter
 }
 
 install_fullconenat() {
@@ -276,11 +271,10 @@ install_fullconenat() {
 
 install_kiddin9() {
     echo "正在安装 kiddin9 源..."
-    ./scripts/feeds install -p kiddin9 -f xray-core xray-plugin dns2tcp dns2socks hysteria naiveproxy sing-box v2ray-geodata v2ray-geoview v2ray-plugin tuic-client chinadns-ng ipt2socks trojan-plus tcping simple-obfs \
-    v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store luci-app-passwall2 alist luci-app-alist \
+    ./scripts/feeds install -p kiddin9 -f ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store luci-app-passwall2 alist luci-app-alist \
     quickstart luci-app-quickstart luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-homeproxy luci-app-amlogic tailscale luci-app-tailscale oaf open-app-filter \
-    luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite luci-app-passwall \
-    luci-app-ramfree luci-app-cpufreq luci-mod-listening-ports luci-app-socat luci-app-zerotier luci-app-upnp luci-app-samba4 luci-app-appfilter \
+    luci-app-oaf luci-app-wan-mac easytier luci-app-easytier luci-app-control-timewol luci-app-wolplus wrtbwmon luci-app-wrtbwmon msd_lite luci-app-msd_lite \
+    luci-app-ramfree luci-app-cpufreq luci-mod-listening-ports luci-app-socat luci-app-zerotier luci-app-upnp luci-app-samba4 \
     luci-app-advancedplus qosmate luci-app-qosmate luci-app-unishare unishare luci-app-bandix luci-app-openclash
 }
 
@@ -301,12 +295,12 @@ install_feeds() {
             if [[ "$dir_name" == "small8" ]]; then
                 install_small8
                 install_fullconenat
-            # elif [[ "$dir_name" == "opentopd" ]]; then
-            #     install_opentopd
+            elif [[ "$dir_name" == "opentopd" ]]; then
+                install_opentopd
             elif [[ "$dir_name" == "kiddin9" ]]; then
                 install_kiddin9
-            # elif [[ "$dir_name" == "node" ]]; then
-            #     install_node
+            elif [[ "$dir_name" == "node" ]]; then
+                install_node
             else
                 ./scripts/feeds install -f -ap $(basename "$dir")
             fi

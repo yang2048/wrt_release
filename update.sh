@@ -990,7 +990,7 @@ main() {
     update_feeds
     remove_unwanted_packages
     remove_tweaked_packages
-    update_homeproxy
+    # update_homeproxy
     fix_default_set
     fix_miniupnpd
     update_golang
@@ -1006,7 +1006,7 @@ main() {
     update_tcping
     add_ax6600_led
     set_custom_task
-    apply_passwall_tweaks
+    # apply_passwall_tweaks
     install_opkg_distfeeds
     update_nss_pbuf_performance
     set_build_signature
@@ -1018,12 +1018,12 @@ main() {
     update_mosdns_deconfig
     fix_quickstart
     update_oaf_deconfig
-    add_timecontrol
+    # add_timecontrol
     add_gecoosac
-    add_quickfile
+    add_quick file
     # update_lucky
     fix_rust_compile_error
-    update_smartdns
+    # update_smartdns
     update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as

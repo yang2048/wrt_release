@@ -38,7 +38,7 @@ FEEDS_CONF="feeds.conf.default"
 GOLANG_REPO="https://github.com/sbwml/packages_lang_golang"
 GOLANG_BRANCH="25.x"
 THEME_SET="argon"
-LAN_ADDR="192.168.1.1"
+LAN_ADDR="192.168.6.1"
 
 clone_repo() {
     if [[ ! -d $BUILD_DIR ]]; then
@@ -1013,7 +1013,7 @@ main() {
     update_affinity_script
     update_ath11k_fw
     # fix_mkpkg_format_invalid
-    change_cpuusage
+    # change_cpuusage
     update_tcping
     add_ax6600_led
     set_custom_task

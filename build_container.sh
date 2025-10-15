@@ -9,7 +9,7 @@ if [ -z "$Dev" ]; then
     exit 1
 fi
 
-LOGFILE="build-$Dev-$(date +%Y%m%d-%H%M%S).log"
+LOGFILE="logs/build-$Dev-$(date +%Y%m%d-%H%M%S).log"
 
 # 把标准输出和标准错误都重定向到 tee
 exec > >(tee -a "$LOGFILE") 2>&1

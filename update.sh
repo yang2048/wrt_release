@@ -41,6 +41,7 @@ THEME_SET="argon"
 LAN_ADDR="192.168.6.1"
 
 clone_repo() {
+    echo "检查源码目录: $BUILD_DIR"
     if [[ ! -d $BUILD_DIR ]]; then
         echo "克隆仓库: $REPO_URL 分支: $REPO_BRANCH"
         if ! git clone --depth 1 -b $REPO_BRANCH $REPO_URL $BUILD_DIR; then
@@ -66,6 +67,7 @@ clean_up() {
 }
 
 reset_feeds_conf() {
+    echo "重置 feeds.conf.default 文件... 分支：$REPO_BRANCH"
     git reset --hard origin/$REPO_BRANCH
     git clean -f -d
     git pull
@@ -332,17 +334,6 @@ apply_hash_fixes() {
         "29970b932d9abdb2a53085d71b4f4964ec3291d8d7c49794a04f2c35fbc6b665" \
         "f56db9077acb7750d0d5b3016ac7d5b9c758898c4d42a7a0956cea204448a182" \
         "smartdns"
-
-    fix_hash_value \
-        "$BUILD_DIR/feeds/nss_packages/firmware/nss-firmware/Makefile" \
-        "3ec87f221e8905d4b6b8b3d207b7f7c4666c3bc8db7c1f06d4ae2e78f863b8f4" \
-        "78039b8d151862e53cd9f9ae632895c5cf586a555cc8c7ed3d5b24678f9e5f79" \
-        "nss-firmware" 
-
-    fix_hash_value \
-        "$BUILD_DIR/feeds/nss_packages/qca-mcs/Makefile" \
-        "a88bc7747f5564acc574f252b63fdf0b401254bf6584e0cbbac44e171dcddcb6" \
-        "2570ab6c101ded40549b32f795516896ae2fc6c7919ecc2fbf0b059b266a246d"
 }
 
 update_ath11k_fw() {
@@ -1047,7 +1038,7 @@ main() {
     update_package "containerd" "releases" "v1.7.27"
     update_package "docker" "tags" "v28.2.2"
     update_package "dockerd" "releases" "v28.2.2"
-    apply_hash_fixes # 调用哈希修正函数
+    apply_hash_fixes
 }
 
 main "$@"

@@ -59,6 +59,7 @@ case $build_choice in
     docker run --rm -it \
         -v "$(pwd)":/build \
         -w /build \
+        --gpus all \
         --shm-size=8g \
         --ipc=shareable \
         --ulimit nofile=65535:65535 \

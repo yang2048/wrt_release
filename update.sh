@@ -223,6 +223,9 @@ remove_unwanted_packages() {
         "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-app-alist"
         "alist" "opkg" "smartdns" "luci-app-smartdns"
     )
+    local kiddin9_packages=(
+        "tcping" "nikki"
+    )
 
     for pkg in "${luci_packages[@]}"; do
         if [[ -d ./feeds/luci/applications/$pkg ]]; then
@@ -248,6 +251,12 @@ remove_unwanted_packages() {
     for pkg in "${small8_packages[@]}"; do
         if [[ -d ./feeds/small8/$pkg ]]; then
             \rm -rf ./feeds/small8/$pkg
+        fi
+    done
+
+    for pkg in "${kiddin9_packages[@]}"; do
+        if [[ -d ./feeds/kiddin9/$pkg ]]; then
+            \rm -rf ./feeds/kiddin9/$pkg
         fi
     done
 
@@ -280,7 +289,7 @@ update_golang() {
 install_small8() {
     ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust \
         sing-box v2ray-core v2ray-geodata v2dat v2ray-plugin tuic-client ipt2socks tcping trojan-plus simple-obfs \
-        shadowsocksr-libev taskd luci-lib-xterm luci-lib-taskd netdata luci-app-netdata \
+        shadowsocksr-libev taskd luci-lib-xterm luci-lib-taskd netdata luci-app-netdata nikki luci-app-nikki \
         lucky luci-app-lucky tailscale luci-app-tailscale oaf open-app-filter 
 }
 
@@ -295,10 +304,10 @@ install_fullconenat() {
 
 install_kiddin9() {
     ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus luci-app-change-mac luci-app-wan-mac easytier luci-app-easytier \
-        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go cups luci-app-cupsd \
+        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go \
         quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store luci-app-oaf luci-app-control-timewol \
         luci-app-wolplus luci-app-supervisord msd_lite luci-app-msd_lite mosdns luci-app-mosdns luci-app-adguardhome luci-app-amlogic \
-        luci-app-passwall luci-app-passwall2 nikki luci-app-nikki luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng
+        luci-app-passwall luci-app-passwall2 luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng
 }
 
 install_opentopd() {

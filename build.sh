@@ -16,6 +16,8 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 set -e
+set -x
+PS4='[$(date "+%Y-%m-%d %H:%M:%S")] '
 
 BASE_PATH=$(cd $(dirname $0) && pwd)
 
@@ -118,9 +120,9 @@ if [[ -d $TARGET_DIR ]]; then
 fi
 
 echo "并行下载 >>  线程数逐步递减"
-make download -j$(($(nproc) * 2)) NO_RECOMMENDS=1 FORCE_UNSAFE_CONFIGURE=1 || make download -j$(nproc) || make download -j1 || make download -j1 V=1 || make download -j1 V=s || exit 1
+make download -j$(($(nproc) * 2)) || make download -j$(nproc) || make download -j1 || make download -j1 V=1 || make download -j1 V=s || exit 1
 echo "并行编译 >>  ..."
-make -j$(($(nproc) + 3)) FORCE_UNSAFE_CONFIGURE=1  || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=s || exit 1
+make -j$(($(nproc) + 1)) || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=s || exit 1
 
 FIRMWARE_DIR="$BASE_PATH/firmware"
 \rm -rf "$FIRMWARE_DIR"

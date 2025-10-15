@@ -33,12 +33,87 @@ REPO_URL=$1
 REPO_BRANCH=$2
 BUILD_DIR=$3
 COMMIT_HASH=$4
+CONFIG_FILE=$5
+DISABLED_FUNCTIONS=$6
+ENABLED_FUNCTIONS=$7
+KERNEL_VERMAGIC=$8
+KERNEL_MODULES=$9
 
 FEEDS_CONF="feeds.conf.default"
 GOLANG_REPO="https://github.com/sbwml/packages_lang_golang"
 GOLANG_BRANCH="25.x"
 THEME_SET="argon"
 LAN_ADDR="192.168.6.1"
+
+_set_config() {
+    key=$1
+    value=$2
+    original=$(grep "^$key" "$CONFIG_FILE" | cut -d'=' -f2)
+    echo "Setting $key=$value (original: $original)"
+    sed -i "s/^\($key\s*=\s*\).*\$/\1$value/" .config
+}
+_set_config_quote() {
+    key=$1
+    value=$2
+    original=$(grep "^$key" "$CONFIG_FILE" | cut -d'=' -f2)
+    echo "Setting $key=\"$value\" (original: $original)"
+    sed -i "s/^\($key\s*=\s*\).*\$/\1\"$value\"/" .config
+}
+_get_config() {
+    key=$1
+    grep "^$key=" "$CONFIG_FILE" | cut -d'=' -f2
+}
+_get_arch_from_config() {
+    value_CONFIG_TARGET_x86_64=$(_get_config "CONFIG_TARGET_x86_64")
+    if [[ $value_CONFIG_TARGET_x86_64 == "y" ]]; then
+        echo "x86_64"
+    else
+        echo "aarch64"
+    fi
+}
+
+_trim_space() {
+    local str=$1
+    echo "$str" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+}
+_call_function() {
+    local func_name=$1
+    shift
+    if type "$func_name" &>/dev/null; then
+        "$func_name" "$@"
+    else
+        echo "    Function '$func_name' not found."
+    fi
+}
+_run_function() {
+    local func_name=$1
+    shift
+    if [[ $func_name =~ ^# ]]; then
+        local original_name=${func_name:1}
+        local original_name=$(_trim_space "$original_name")
+        if [[ $ENABLED_FUNCTIONS =~ $original_name ]]; then
+            echo "+ '$original_name'"
+            echo "    Call Force-Enabled Function '$original_name'"
+            _call_function "$original_name" "$@"
+        else
+            echo "- '$original_name'"
+            echo "    Skip Comment Function '$original_name'"
+        fi
+    elif [[ $DISABLED_FUNCTIONS =~ $func_name ]]; then
+        echo "- '$func_name'"
+        echo "    Skip Disabled Function '$func_name'"
+    else
+        echo "+ '$func_name'"
+        _call_function "$func_name" "$@"
+    fi
+}
+_foreach_function() {
+    while read -r func_name; do
+        if [ -n "$func_name" ]; then
+            _run_function "$func_name"
+        fi
+    done < <(cat)
+}
 
 clone_repo() {
     echo "检查源码目录: $BUILD_DIR"
@@ -49,6 +124,12 @@ clone_repo() {
             exit 1
         fi
     fi
+    # if [[ "$Build_Mod" == "container" ]]; then
+    #     rm -rf "$BUILD_DIR/staging_dir"
+    #     rm -rf "$BUILD_DIR/build_dir"
+    #     ln -sf /home/build/immortalwrt/build_dir "$BUILD_DIR/build_dir"
+    #     ln -sf /home/build/immortalwrt/staging_dir "$BUILD_DIR/staging_dir"
+    # fi
 }
 
 clean_up() {
@@ -67,8 +148,12 @@ clean_up() {
 }
 
 reset_feeds_conf() {
-    echo "重置 feeds.conf.default 文件... 分支：$REPO_BRANCH"
-    git reset --hard origin/$REPO_BRANCH
+    if [ "$(git symbolic-ref -q HEAD)" == "" ]; then
+        echo "[git] Detached HEAD state Mode"
+        git reset --hard HEAD
+    else
+        git reset --hard origin/$REPO_BRANCH
+    fi
     git clean -f -d
     git pull
     if [[ $COMMIT_HASH != "none" ]]; then
@@ -79,14 +164,27 @@ reset_feeds_conf() {
 update_feeds() {
     # 删除注释行
     sed -i '/^#/d' "$BUILD_DIR/$FEEDS_CONF"
-
+    add_feeds() {
+        local feed=$1
+        local url=$2
+        if ! grep -q "$feed" "$BUILD_DIR/$FEEDS_CONF"; then
+            # 确保文件以换行符结尾
+            [ -z "$(tail -c 1 "$BUILD_DIR/$FEEDS_CONF")" ] || echo "" >>"$BUILD_DIR/$FEEDS_CONF"
+            echo "src-git $feed $url" >>"$BUILD_DIR/$FEEDS_CONF"
+        fi
+    }
     # 检查并添加 small-package 源
-    if ! grep -q "small-package" "$BUILD_DIR/$FEEDS_CONF"; then
-        # 确保文件以换行符结尾
-        [ -z "$(tail -c 1 "$BUILD_DIR/$FEEDS_CONF")" ] || echo "" >>"$BUILD_DIR/$FEEDS_CONF"
-        echo "src-git small8 https://github.com/kenzok8/small-package" >>"$BUILD_DIR/$FEEDS_CONF"
-    fi
-
+    add_feeds "small8" "https://github.com/kenzok8/small-package"
+    # 检查并添加 kwrt 源
+    add_feeds "kiddin9" "https://github.com/kiddin9/kwrt-packages.git"
+    # 检查并添加 AWG-OpenWRT 源
+    add_feeds "awg" "https://github.com/Slava-Shchipunov/awg-openwrt"
+    # 检查并添加 opentopd 源
+    # add_feeds "opentopd" "https://github.com/sirpdboy/sirpdboy-package"
+    # 检查并添加 node 源
+    # add_feeds "node" "https://github.com/nxhack/openwrt-node-packages.git;openwrt-24.10"
+    # 检查并添加 libremesh 源
+    # add_feeds "libremesh" "https://github.com/libremesh/lime-packages"
     # 添加bpf.mk解决更新报错
     if [ ! -f "$BUILD_DIR/include/bpf.mk" ]; then
         touch "$BUILD_DIR/include/bpf.mk"
@@ -180,15 +278,10 @@ update_golang() {
 }
 
 install_small8() {
-    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
-        naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
-        tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
-        luci-app-passwall v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go \
-        luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart \
-        luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest netdata luci-app-netdata \
-        luci-app-openclash luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki \
-        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
-        msd_lite luci-app-msd_lite cups luci-app-cupsd
+    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust \
+        sing-box v2ray-core v2ray-geodata v2dat v2ray-plugin tuic-client ipt2socks tcping trojan-plus simple-obfs \
+        shadowsocksr-libev taskd luci-lib-xterm luci-lib-taskd netdata luci-app-netdata \
+        lucky luci-app-lucky tailscale luci-app-tailscale oaf open-app-filter 
 }
 
 install_fullconenat() {
@@ -200,14 +293,42 @@ install_fullconenat() {
     fi
 }
 
+install_kiddin9() {
+    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus luci-app-change-mac luci-app-wan-mac easytier luci-app-easytier \
+        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go cups luci-app-cupsd \
+        quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store luci-app-oaf luci-app-control-timewol \
+        luci-app-wolplus luci-app-supervisord msd_lite luci-app-msd_lite mosdns luci-app-mosdns luci-app-adguardhome luci-app-amlogic \
+        luci-app-passwall luci-app-passwall2 nikki luci-app-nikki luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng
+}
+
+install_opentopd() {
+    # \rm -rf ./feeds/opentopd/luci-app-advancedplus
+    # git clone https://github.com/sirpdboy/luci-app-advancedplus.git ./feeds/opentopd/luci-app-advancedplus
+    ./scripts/feeds install -p opentopd -f cpulimit luci-app-cpulimit luci-app-advanced
+}
+
+install_node() {
+    ./scripts/feeds update node
+    \rm -rf ./package/feeds/packages/node
+    \rm -rf ./package/feeds/packages/node-*
+    ./scripts/feeds install -a -p node
+}
+
 install_feeds() {
     ./scripts/feeds update -i
     for dir in $BUILD_DIR/feeds/*; do
         # 检查是否为目录并且不以 .tmp 结尾，并且不是软链接
         if [ -d "$dir" ] && [[ ! "$dir" == *.tmp ]] && [ ! -L "$dir" ]; then
-            if [[ $(basename "$dir") == "small8" ]]; then
+            dir_name=$(basename "$dir")
+            if [[ "$dir_name" == "small8" ]]; then
                 install_small8
                 install_fullconenat
+            elif [[ "$dir_name" == "opentopd" ]]; then
+                install_opentopd
+            elif [[ "$dir_name" == "kiddin9" ]]; then
+                install_kiddin9
+            elif [[ "$dir_name" == "node" ]]; then
+                install_node
             else
                 ./scripts/feeds install -f -ap $(basename "$dir")
             fi
@@ -337,21 +458,23 @@ apply_hash_fixes() {
 }
 
 update_ath11k_fw() {
-    local makefile="$BUILD_DIR/package/firmware/ath11k-firmware/Makefile"
-    local new_mk="$BASE_PATH/patches/ath11k_fw.mk"
-    local url="https://raw.githubusercontent.com/VIKINGYFY/immortalwrt/refs/heads/main/package/firmware/ath11k-firmware/Makefile"
+    if [[ $BUILD_DIR != *"imm-nss"* ]]; then
+        local makefile="$BUILD_DIR/package/firmware/ath11k-firmware/Makefile"
+        local new_mk="$BASE_PATH/patches/ath11k_fw.mk"
+        local url="https://raw.githubusercontent.com/VIKINGYFY/immortalwrt/refs/heads/main/package/firmware/ath11k-firmware/Makefile"
 
-    if [ -d "$(dirname "$makefile")" ]; then
-        echo "正在更新 ath11k-firmware Makefile..."
-        if ! curl -fsSL -o "$new_mk" "$url"; then
-            echo "错误：从 $url 下载 ath11k-firmware Makefile 失败" >&2
-            exit 1
+        if [ -d "$(dirname "$makefile")" ]; then
+            echo "正在更新 ath11k-firmware Makefile..."
+            if ! curl -fsSL -o "$new_mk" "$url"; then
+                echo "错误：从 $url 下载 ath11k-firmware Makefile 失败" >&2
+                exit 1
+            fi
+            if [ ! -s "$new_mk" ]; then
+                echo "错误：下载的 ath11k-firmware Makefile 为空文件" >&2
+                exit 1
+            fi
+            mv -f "$new_mk" "$makefile"
         fi
-        if [ ! -s "$new_mk" ]; then
-            echo "错误：下载的 ath11k-firmware Makefile 为空文件" >&2
-            exit 1
-        fi
-        mv -f "$new_mk" "$makefile"
     fi
 }
 
@@ -540,6 +663,39 @@ update_menu_location() {
     fi
 }
 
+update_proxy_app_menu_location() {
+    # passwall
+    local passwall_path="$BUILD_DIR/package/feeds/small8/luci-app-passwall/luasrc/controller/passwall.lua"
+    if [ -d "${passwall_path%/*}" ] && [ -f "$passwall_path" ]; then
+        local pos=$(grep -n "entry" "$passwall_path" | head -n 1 | awk -F ":" '{print $1}')
+        if [ -n "$pos" ]; then
+            sed -i ''${pos}'i\	entry({"admin", "proxy"}, firstchild(), "Proxy", 30).dependent = false' "$passwall_path"
+            sed -i 's/"services"/"proxy"/g' "$passwall_path"
+        fi
+    fi
+    # passwall2
+    local passwall2_path="$BUILD_DIR/package/feeds/small8/luci-app-passwall2/luasrc/controller/passwall2.lua"
+    if [ -d "${passwall2_path%/*}" ] && [ -f "$passwall2_path" ]; then
+        local pos=$(grep -n "entry" "$passwall2_path" | head -n 1 | awk -F ":" '{print $1}')
+        if [ -n $pos ]; then
+            sed -i ''${pos}'i\	entry({"admin", "proxy"}, firstchild(), "Proxy", 30).dependent = false' "$passwall2_path"
+            sed -i 's/"services"/"proxy"/g' "$passwall2_path"
+        fi
+    fi
+
+    # homeproxy
+    local homeproxy_path="$BUILD_DIR/package/feeds/small8/luci-app-homeproxy/root/usr/share/luci/menu.d/luci-app-homeproxy.json"
+    if [ -d "${homeproxy_path%/*}" ] && [ -f "$homeproxy_path" ]; then
+        sed -i 's/\/services\//\/proxy\//g' "$homeproxy_path"
+    fi
+
+    # nikki
+    local nikki_path="$BUILD_DIR/package/feeds/small8/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json"
+    if [ -d "${nikki_path%/*}" ] && [ -f "$nikki_path" ]; then
+        sed -i 's/\/services\//\/proxy\//g' "$nikki_path"
+    fi
+}
+
 fix_compile_coremark() {
     local file="$BUILD_DIR/feeds/packages/utils/coremark/Makefile"
     if [ -d "$(dirname "$file")" ] && [ -f "$file" ]; then
@@ -570,10 +726,11 @@ update_dnsmasq_conf() {
 
 # 更新版本
 update_package() {
-    local dir=$(find "$BUILD_DIR/package" \( -type d -o -type l \) -name "$1")
+    local dir=$(find "$BUILD_DIR/package/feeds" \( -type d -o -type l \) -name "$1")
     if [ -z "$dir" ]; then
         return 0
     fi
+    echo "更新软件包 $dir"
     local branch="$2"
     if [ -z "$branch" ]; then
         branch="releases"
@@ -621,16 +778,34 @@ update_package() {
         PKG_SOURCE=${PKG_SOURCE//\$\(PKG_VERSION\)/$PKG_VER}
 
         local PKG_HASH
-        if ! PKG_HASH=$(curl -fsSL "$PKG_SOURCE_URL""$PKG_SOURCE" | sha256sum | cut -b -64); then
+        if ! PKG_HASH=$(curl -fsSL "$PKG_SOURCE_URL"/"$PKG_SOURCE" | sha256sum | cut -b -64); then
             echo "错误：从 $PKG_SOURCE_URL$PKG_SOURCE 获取软件包哈希失败" >&2
             return 1
         fi
 
+        local old_version=$(awk -F"=" '/PKG_VERSION:=/ {print $NF}' "$mk_path" | grep -oE "[\.0-9]{1,}" | head -1)
+        echo "当前版本: $old_version, 目标版本: $PKG_VER"
         sed -i 's/^PKG_VERSION:=.*/PKG_VERSION:='$PKG_VER'/g' "$mk_path"
         sed -i 's/^PKG_HASH:=.*/PKG_HASH:='$PKG_HASH'/g' "$mk_path"
 
         echo "更新软件包 $1 到 $PKG_VER $PKG_HASH"
+    else
+        echo "错误：未找到 $1 的 Makefile" >&2
+        return 1
     fi
+}
+
+update_packages() {
+    # https://github.com/opencontainers/runc
+    update_package "runc" "releases" "v1.3.0" || exit 1
+    # https://github.com/containerd/containerd
+    update_package "containerd" "releases" "v1.7.28" || exit 1
+    # https://github.com/docker/cli
+    update_package "docker" "tags" "v28.5.1" || exit 1
+    # https://github.com/moby/moby
+    update_package "dockerd" "releases" "v28.5.1" || exit 1
+    # https://github.com/docker/compose
+    update_package "docker-compose" "releases" "v2.40.0" || exit 1
 }
 
 # 添加系统升级时的备份信息
@@ -642,6 +817,8 @@ function add_backup_info_to_sysupgrade() {
 /etc/AdGuardHome.yaml
 /etc/easytier
 /etc/lucky/
+/etc/lxc/
+/etc/ddns-go/
 EOF
     fi
 }
@@ -736,6 +913,18 @@ add_gecoosac() {
     echo "正在添加 openwrt-gecoosac..."
     if ! git clone --depth 1 "$repo_url" "$gecoosac_dir"; then
         echo "错误：从 $repo_url 克隆 openwrt-gecoosac 仓库失败" >&2
+        exit 1
+    fi
+}
+
+add_awg() {
+    local awg_dir="$BUILD_DIR/package/awg-openwrt"
+    local repo_url="https://github.com/Slava-Shchipunov/awg-openwrt"
+    # 删除旧的目录（如果存在）
+    rm -rf "$awg_dir" 2>/dev/null
+    echo "正在添加 awg-openwrt..."
+    if ! git clone --depth 1 "$repo_url" "$awg_dir" -b master; then
+        echo "错误：从 $repo_url 克隆 awg-openwrt 仓库失败" >&2
         exit 1
     fi
 }
@@ -900,7 +1089,7 @@ set_nginx_default_config() {
     local nginx_config_path="$BUILD_DIR/feeds/packages/net/nginx-util/files/nginx.config"
     if [ -f "$nginx_config_path" ]; then
         # 使用 cat 和 heredoc 覆盖写入 nginx.config 文件
-        cat > "$nginx_config_path" <<EOF
+        cat >"$nginx_config_path" <<EOF
 config main 'global'
         option uci_enable 'true'
 
@@ -965,27 +1154,119 @@ remove_tweaked_packages() {
 }
 
 update_argon() {
-    local repo_url="https://github.com/ZqinKing/luci-theme-argon.git"
-    local dst_theme_path="$BUILD_DIR/feeds/luci/themes/luci-theme-argon"
-    local tmp_dir
-    tmp_dir=$(mktemp -d)
+    git clone https://github.com/LazuliKao/luci-theme-argon -b openwrt-24.10 ./feeds/luci/themes/luci-theme-argon-new
+    rm -rf ./feeds/luci/themes/luci-theme-argon
+    mv ./feeds/luci/themes/luci-theme-argon-new/luci-theme-argon ./feeds/luci/themes/luci-theme-argon
+    rm -rf ./feeds/luci/applications/luci-app-argon-config
+    mv ./feeds/luci/themes/luci-theme-argon-new/luci-app-argon-config ./feeds/luci/applications/luci-app-argon-config
+    \rm -rf ./feeds/luci/themes/luci-theme-argon-new
 
-    echo "正在更新 argon 主题..."
+    # local repo_url="https://github.com/LazuliKao/luci-theme-argon.git"
+    # local dst_theme_path="$BUILD_DIR/feeds/luci/themes/luci-theme-argon"
+    # local tmp_dir
+    # tmp_dir=$(mktemp -d)
 
-    if ! git clone --depth 1 "$repo_url" "$tmp_dir"; then
-        echo "错误：从 $repo_url 克隆 argon 主题仓库失败" >&2
-        rm -rf "$tmp_dir"
-        exit 1
-    fi
+    # echo "正在更新 argon 主题..."
 
-    rm -rf "$dst_theme_path"
-    rm -rf "$tmp_dir/.git"
-    mv "$tmp_dir" "$dst_theme_path"
+    # if ! git clone --depth 1 "$repo_url" "$tmp_dir"; then
+    #     echo "错误：从 $repo_url 克隆 argon 主题仓库失败" >&2
+    #     rm -rf "$tmp_dir"
+    #     exit 1
+    # fi
+
+    # rm -rf "$dst_theme_path"
+    # rm -rf "$tmp_dir/.git"
+    # mv "$tmp_dir" "$dst_theme_path"
 
     echo "luci-theme-argon 更新完成"
 }
 
+update_base_files() {
+    local base_files_path="$BUILD_DIR/package/base-files/files"
+    local uci_defaults_path="$base_files_path/etc/uci-defaults"
+    if [ -d "$uci_defaults_path" ]; then
+        cp -f "$BASE_PATH/uci-defaults/"* "$uci_defaults_path"
+    fi
+}
+
+add_ohmyzsh() {
+    local base_files_path="$BUILD_DIR/package/base-files/files"
+    echo "Adding oh-my-zsh"
+    mkdir -p "$base_files_path/root"
+    if [ -d "$base_files_path/root/.oh-my-zsh" ]; then
+        rm -rf "$base_files_path/root/.oh-my-zsh"
+    fi
+    # git clone https://mirror.nju.edu.cn/git/ohmyzsh.git "$base_files_path/root/.oh-my-zsh"
+    git clone --depth 1 https://github.com/ohmyzsh/ohmyzsh.git "$base_files_path/root/.oh-my-zsh"
+    if [ -f "$base_files_path/root/.zshrc" ]; then
+        rm "$base_files_path/root/.zshrc"
+    fi
+    cp "$base_files_path/root/.oh-my-zsh/templates/zshrc.zsh-template" "$base_files_path/root/.zshrc"
+    # echo "source /etc/profile" >> "$base_files_path/root/.zshrc"
+    sed -i "1i source /etc/profile" "$base_files_path/root/.zshrc"
+    # sed -i "s:/bin/ash:/usr/bin/zsh:g" "base_files_path/etc/passwd"
+
+    # add plugins
+    local plugins_dir="$base_files_path/root/.oh-my-zsh/custom/plugins"
+    mkdir -p "$plugins_dir"
+    
+    echo "Installing zsh-autocomplete plugin..."
+    if [ ! -d "$plugins_dir/zsh-autocomplete" ]; then
+        git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git "$plugins_dir/zsh-autocomplete"
+    fi
+    
+    echo "Installing zsh-autosuggestions plugin..."
+    if [ ! -d "$plugins_dir/zsh-autosuggestions" ]; then
+        git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git "$plugins_dir/zsh-autosuggestions"
+    fi
+    
+    echo "Installing zsh-syntax-highlighting plugin..."
+    if [ ! -d "$plugins_dir/zsh-syntax-highlighting" ]; then
+        git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugins_dir/zsh-syntax-highlighting"
+    fi
+    
+    # Update .zshrc to enable plugins
+    sed -i 's/^plugins=(.*/plugins=(git zsh-autocomplete zsh-autosuggestions zsh-syntax-highlighting)/' "$base_files_path/root/.zshrc"
+}
+
+add_turboacc() {
+    cd "$BUILD_DIR"
+    curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh
+    bash add_turboacc.sh --no-sfe
+    cd -
+}
+
+fix_node_build() {
+    # build node in single thread to avoid out of memory
+    local node_makefile="$BUILD_DIR/feeds/packages/lang/node/Makefile"
+    if [ -f "$node_makefile" ]; then
+        # 禁止并行编译，避免 OOM
+        if ! grep -q "^PKG_BUILD_PARALLEL:=0" "$node_makefile"; then
+            sed -i '/^PKG_NAME:=node/a PKG_BUILD_PARALLEL:=0' "$node_makefile"
+        else
+            echo "PKG_BUILD_PARALLEL already set to 0 in $node_makefile"
+        fi
+    fi
+}
+
+fix_libffi() {
+    local original_makefile="$BUILD_DIR/package/feeds/packages/libffi/Makefile"
+    if [ -f "$original_makefile" ]; then
+        echo "Restoring original libffi Makefile from openwrt..."
+        curl -fsSL -o "$original_makefile" "https://raw.githubusercontent.com/openwrt/packages/refs/heads/openwrt-24.10/libs/libffi/Makefile"
+    fi
+    update_package "libffi" "releases" "v3.5.2" || exit 1
+}
+
+tailscale_use_awg() {
+    local tailscale_makefile="$BUILD_DIR/package/feeds/small8/tailscale/Makefile"
+    sed -i 's|^PKG_SOURCE_URL:=.*|PKG_SOURCE_URL:=https://codeload.github.com/LiuTangLei/tailscale/tar.gz/v$(PKG_VERSION)?|' "$tailscale_makefile"
+    update_package "tailscale" "releases" "v1.88.3" || exit 1
+}
+
 main() {
+    cat <<EOF | _foreach_function
+
     clone_repo
     clean_up
     reset_feeds_conf
@@ -1002,7 +1283,7 @@ main() {
     update_default_lan_addr
     remove_something_nss_kmod
     update_affinity_script
-    update_ath11k_fw
+    # update_ath11k_fw
     # fix_mkpkg_format_invalid
     # change_cpuusage
     update_tcping
@@ -1014,6 +1295,7 @@ main() {
     set_build_signature
     update_nss_diag
     update_menu_location
+    # update_proxy_app_menu_location
     fix_compile_coremark
     update_dnsmasq_conf
     add_backup_info_to_sysupgrade
@@ -1024,21 +1306,25 @@ main() {
     add_gecoosac
     add_quickfile
     # update_lucky
-    fix_rust_compile_error
     # update_smartdns
     update_diskman
+    fix_rust_compile_error
     set_nginx_default_config
     update_uwsgi_limit_as
     update_argon
     install_feeds
     update_adguardhome
     update_script_priority
+    update_base_files
+    add_ohmyzsh
+    # add_turboacc
     update_geoip
-    update_package "runc" "releases" "v1.2.6"
-    update_package "containerd" "releases" "v1.7.27"
-    update_package "docker" "tags" "v28.2.2"
-    update_package "dockerd" "releases" "v28.2.2"
+    update_packages
+    fix_node_build
+    fix_libffi
+    tailscale_use_awg
     apply_hash_fixes
+EOF
 }
 
 main "$@"

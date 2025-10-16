@@ -107,6 +107,7 @@ _run_function() {
         _call_function "$func_name" "$@"
     fi
 }
+
 _foreach_function() {
     while read -r func_name; do
         if [ -n "$func_name" ]; then
@@ -194,7 +195,7 @@ update_feeds() {
     # if grep -q "nss_packages" "$BUILD_DIR/$FEEDS_CONF"; then
     #     sed -i '/nss_packages/d' "$BUILD_DIR/$FEEDS_CONF"
     #     [ -z "$(tail -c 1 "$BUILD_DIR/$FEEDS_CONF")" ] || echo "" >>"$BUILD_DIR/$FEEDS_CONF"
-    #     echo "src-git nss_packages https://github.com/LiBwrt/nss-packages.git" >>"$BUILD_DIR/$FEEDS_CONF"
+        # echo "src-git nss_packages https://github.com/LiBwrt/nss-packages.git" >>"$BUILD_DIR/$FEEDS_CONF"
     # fi
 
     # 更新 feeds
@@ -304,7 +305,7 @@ install_fullconenat() {
 
 install_kiddin9() {
     ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus luci-app-change-mac luci-app-wan-mac easytier luci-app-easytier \
-        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go \
+        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go geoview \
         quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store luci-app-oaf luci-app-control-timewol \
         luci-app-wolplus luci-app-supervisord msd_lite luci-app-msd_lite mosdns luci-app-mosdns luci-app-adguardhome luci-app-amlogic \
         luci-app-passwall luci-app-passwall2 luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng
@@ -453,17 +454,17 @@ fix_hash_value() {
 
 # 应用所有哈希值修正
 apply_hash_fixes() {
-    fix_hash_value \
-        "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
-        "deb3ba1a8ca88fb7294acfb46c5d8881dfe36e816f4746f4760245907ebd0b98" \
-        "04d1ca0990a840a6e5fd05fe8c59b6c71e661a07d6e131e863441f3a9925b9c8" \
-        "smartdns"
+    # fix_hash_value \
+    #     "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
+    #     "deb3ba1a8ca88fb7294acfb46c5d8881dfe36e816f4746f4760245907ebd0b98" \
+    #     "04d1ca0990a840a6e5fd05fe8c59b6c71e661a07d6e131e863441f3a9925b9c8" \
+    #     "smartdns"
 
-    fix_hash_value \
-        "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
-        "29970b932d9abdb2a53085d71b4f4964ec3291d8d7c49794a04f2c35fbc6b665" \
-        "f56db9077acb7750d0d5b3016ac7d5b9c758898c4d42a7a0956cea204448a182" \
-        "smartdns"
+    # fix_hash_value \
+    #     "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
+    #     "29970b932d9abdb2a53085d71b4f4964ec3291d8d7c49794a04f2c35fbc6b665" \
+    #     "f56db9077acb7750d0d5b3016ac7d5b9c758898c4d42a7a0956cea204448a182" \
+    #     "smartdns"
 }
 
 update_ath11k_fw() {
@@ -1333,6 +1334,7 @@ main() {
     fix_libffi
     tailscale_use_awg
     apply_hash_fixes
+    # fix_kernel_magic
 EOF
 }
 

@@ -72,50 +72,6 @@ _get_arch_from_config() {
     fi
 }
 
-_trim_space() {
-    local str=$1
-    echo "$str" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
-}
-_call_function() {
-    local func_name=$1
-    shift
-    if type "$func_name" &>/dev/null; then
-        "$func_name" "$@"
-    else
-        echo "    Function '$func_name' not found."
-    fi
-}
-_run_function() {
-    local func_name=$1
-    shift
-    if [[ $func_name =~ ^# ]]; then
-        local original_name=${func_name:1}
-        local original_name=$(_trim_space "$original_name")
-        if [[ $ENABLED_FUNCTIONS =~ $original_name ]]; then
-            echo "+ '$original_name'"
-            echo "    Call Force-Enabled Function '$original_name'"
-            _call_function "$original_name" "$@"
-        else
-            echo "- '$original_name'"
-            echo "    Skip Comment Function '$original_name'"
-        fi
-    elif [[ $DISABLED_FUNCTIONS =~ $func_name ]]; then
-        echo "- '$func_name'"
-        echo "    Skip Disabled Function '$func_name'"
-    else
-        echo "+ '$func_name'"
-        _call_function "$func_name" "$@"
-    fi
-}
-
-_foreach_function() {
-    while read -r func_name; do
-        if [ -n "$func_name" ]; then
-            _run_function "$func_name"
-        fi
-    done < <(cat)
-}
-
 clone_repo() {
     echo "检查源码目录: $BUILD_DIR"
     if [[ ! -d $BUILD_DIR ]]; then
@@ -454,17 +410,18 @@ fix_hash_value() {
 
 # 应用所有哈希值修正
 apply_hash_fixes() {
-    # fix_hash_value \
-    #     "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
-    #     "deb3ba1a8ca88fb7294acfb46c5d8881dfe36e816f4746f4760245907ebd0b98" \
-    #     "04d1ca0990a840a6e5fd05fe8c59b6c71e661a07d6e131e863441f3a9925b9c8" \
-    #     "smartdns"
+     fix_hash_value \
+         "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
+         "deb3ba1a8ca88fb7294acfb46c5d8881dfe36e816f4746f4760245907ebd0b98" \
+         "04d1ca0990a840a6e5fd05fe8c59b6c71e661a07d6e131e863441f3a9925b9c8" \
+         "smartdns"
 
     # fix_hash_value \
     #     "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
     #     "29970b932d9abdb2a53085d71b4f4964ec3291d8d7c49794a04f2c35fbc6b665" \
     #     "f56db9077acb7750d0d5b3016ac7d5b9c758898c4d42a7a0956cea204448a182" \
     #     "smartdns"
+    find $BUILD_DIR/feeds/nss_packages/ -name "Makefile" -exec sed -i 's/PKG_MIRROR_HASH:=.*/PKG_MIRROR_HASH:=/' {} \;
 }
 
 update_ath11k_fw() {
@@ -1274,6 +1231,51 @@ tailscale_use_awg() {
     update_package "tailscale" "releases" "v1.88.3" || exit 1
 }
 
+_trim_space() {
+    local str=$1
+    echo "$str" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+}
+_call_function() {
+    local func_name=$1
+    shift
+    if type "$func_name" &>/dev/null; then
+        "$func_name" "$@"
+    else
+        echo "    Function '$func_name' not found."
+    fi
+}
+_run_function() {
+    local func_name=$1
+    shift
+    if [[ $func_name =~ ^# ]]; then
+        local original_name=${func_name:1}
+        local original_name=$(_trim_space "$original_name")
+        if [[ $ENABLED_FUNCTIONS =~ $original_name ]]; then
+            echo "+ '$original_name'"
+            echo "    Call Force-Enabled Function '$original_name'"
+            _call_function "$original_name" "$@"
+        else
+            echo "- '$original_name'"
+            echo "    Skip Comment Function '$original_name'"
+        fi
+    elif [[ $DISABLED_FUNCTIONS =~ $func_name ]]; then
+        echo "- '$func_name'"
+        echo "    Skip Disabled Function '$func_name'"
+    else
+        echo "+ '$func_name'"
+        _call_function "$func_name" "$@"
+    fi
+}
+
+_foreach_function() {
+    while read -r func_name; do
+        if [ -n "$func_name" ]; then
+            _run_function "$func_name"
+        fi
+    done < <(cat)
+}
+
+
 main() {
     cat <<EOF | _foreach_function
 
@@ -1328,13 +1330,12 @@ main() {
     update_base_files
     add_ohmyzsh
     # add_turboacc
-    update_geoip
-    update_packages
+    # update_geoip
+    # update_packages
     fix_node_build
     fix_libffi
     tailscale_use_awg
     apply_hash_fixes
-    # fix_kernel_magic
 EOF
 }
 

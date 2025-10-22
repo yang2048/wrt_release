@@ -33,7 +33,7 @@ jobs:
   setup:
     strategy:
       matrix:
-        os: [ubuntu-24.04]
+        os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     
     steps:
@@ -51,8 +51,8 @@ jobs:
           echo "--------------------------硬盘信息--------------------------"
           echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
-      - name: Free disk space
-        uses: sbwml/actions@free-disk
+      # - name: Free disk space(释放磁盘空间)
+        # uses: sbwml/actions@free-disk
         # run: |
         #   sudo docker image prune --all --force
         #   sudo rm -rf /usr/share/dotnet /usr/local/lib/android $AGENT_TOOLSDIRECTORY
@@ -68,41 +68,56 @@ jobs:
         #   sudo apt-get autoremove -y || echo "::warning::The command [sudo apt-get autoremove -y] failed to complete successfully. Proceeding..."
         #   sudo apt-get clean || echo "::warning::The command [sudo apt-get clean] failed to complete successfully. Proceeding..."
 
-      - name: Build System Setup
+      - name: Combine Disks(合并并释放磁盘)
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 4096
+          temp-reserve-mb: 500
+          root-reserve-mb: 2048
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-docker-images: 'true'
+          remove-haskell: 'true'
+        run: |
+          sudo apt-get -y purge firefox clang* google* llvm* mono* mongo* mysql* php*
+          sudo apt-get -y autoremove --purge
+          sudo apt-get clean
+          sudo rm -rf /etc/mysql /etc/php /usr/lib/{jvm,llvm} /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm} /usr/libexec/gcc/x86_64-linux-gnu/14 /usr/lib/x86_64-linux-gnu/{*clang*,*LLVM*} /home/linuxbrew
+          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+          rm -rf ~/{.cargo,.dotnet,.rustup}
+          echo "::endgroup::"
+
+
+      - name: Build System Setup(系统环境设置)
         run: |
           sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.org/init_build_environment.sh)'
           sudo -E apt -yqq install dos2unix libfuse-dev
           sudo -E apt -yqq autoclean
+          sudo -E apt -yqq clean
           sudo -E systemctl daemon-reload
 
-      - name: Set Build Date and Timezone
+      - name: Set Build Date and Timezone(设置编译日期和时区)
         run: |
           sudo -E timedatectl set-timezone "$TZ"
           export BUILD_DATE=$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")
           echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
 
-      - name: Combine Disks(合并磁盘)
-        uses: easimon/maximize-build-space@master
-        with:
-          swap-size-mb: 1024
-          temp-reserve-mb: 100
-          root-reserve-mb: 1024
-
-      - name: Checkout
+      - name: Checkout(检出代码)
         uses: actions/checkout@v4
 
-      - name: Check Server Performance(检查服务器性能)
+      - name: Check Server Performance(检查服务器可以空间)
         run: |
+          echo "⚠"
           echo "--------------------------内存信息--------------------------"
           echo "已安装内存详细信息："
           echo -e "$(sudo lshw -short -C memory | grep GiB) \n"
           echo "--------------------------硬盘信息--------------------------"
           echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
-      - name: Pre Clone
+      - name: Pre Clone(预克隆脚本)
         run: ./pre_clone_action.sh ${{ inputs.model }}
 
-      - name: Cache Dependencies
+      - name: Cache Dependencies(缓存依赖)
         uses: actions/cache@v4
         with:
           path: |
@@ -112,7 +127,7 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-${{ hashFiles('**/repo_flag') }}-
 
-      - name: Refresh the cache
+      - name: Refresh the cache(刷新缓存)
         run: |
           if [ -d "./action_build/staging_dir" ]; then
             find "./action_build/staging_dir" -type d -name "stamp" -not -path "*target*" | while read -r dir; do
@@ -120,39 +135,10 @@ jobs:
             done
           fi
 
-  build:
-    needs: setup
-    strategy:
-      matrix:
-        os: [ubuntu-24.04]
-    runs-on: ${{ matrix.os }}
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Restore Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./action_build/.ccache
-            ./action_build/staging_dir
-          key: ${{ matrix.os }}-${{ hashFiles('**/repo_flag') }}-${{ env.BUILD_DATE }}
-          restore-keys: |
-            ${{ matrix.os }}-${{ hashFiles('**/repo_flag') }}-
-
-      - name: Build Firmware
+      - name: Build Firmware(构建固件)
         run: ./build.sh ${{ inputs.model }}
-
-      - name: Machine Information(检查空间使用情况)
-        run: |
-          echo "=============================================="
-          lscpu | grep -E "name|Core|Thread"
-          echo "=============================================="
-          df -hT
-          echo "=============================================="
-          
-      - name: Delete Old Cache
+   
+      - name: Delete Old Cache(删除旧缓存)
         run: |
           # 获取缓存列表并删除
           gh cache list --key ${{ matrix.os }}-${{ hashFiles('**/repo_flag') }}- --json key --jq '.[] | .key' | while read -r key; do
@@ -162,8 +148,17 @@ jobs:
           echo "========cache status========"
           echo "ccache: $(du -sh ./action_build/.ccache | cut -f 1)"
           echo "staging: $(du -sh ./action_build/staging_dir | cut -f 1)"
-
-      - name: Upload Firmware
+      
+      - name: Machine Information(检查空间使用情况)
+        run: |
+          echo "⚠"
+          echo "=============================================="
+          lscpu | grep -E "name|Core|Thread"
+          echo "=============================================="
+          df -hT
+          echo "=============================================="
+       
+      - name: Upload Firmware(上传固件)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.BUILD_DATE }}_${{ inputs.model }}

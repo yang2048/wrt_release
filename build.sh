@@ -125,7 +125,8 @@ if [[ -d $TARGET_DIR ]]; then
 fi
 
 echo "并行下载 >>  线程数逐步递减"
-make download -j$(($(nproc) * 2)) DISABLE_HASH_CHECK=1 || make download -j$(nproc) || make download -j1 || make download -j1 V=s || df -hT || exit 1
+make download -j$(($(nproc) * 2)) DISABLE_HASH_CHECK=1 || make download -j$(nproc) || make download -j1 || make download -j1 V=s || exit 1
+echo "检查空间使用情况⚠"
 echo "--------------------------内存信息--------------------------"
 echo "已安装内存详细信息："
 echo -e "$(sudo lshw -short -C memory | grep GiB) \n"

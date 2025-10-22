@@ -10,11 +10,11 @@ if [ -z "$Dev" ]; then
 fi
 
 LOGFILE="logs/build-$Dev-$(date +%Y%m%d-%H%M%S).log"
-
-mkdir -p logs
+echo "日志保存在 $LOGFILE"
+sudo mkdir -p logs
 
 # 将标准输出和标准错误重定向到带时间戳的tee命令
-exec > >(while IFS= read -r line; do echo "$(date '+%Y-%m-%d %H:%M:%S') $line"; done | tee -a "$LOGFILE") 2>&1
+exec > >(tee -a "$LOGFILE") 2>&1
 
 # 打开命令回显
 set -x

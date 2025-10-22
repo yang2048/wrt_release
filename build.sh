@@ -17,7 +17,7 @@
 
 set -e
 set -x
-PS4='[$(date "+%Y-%m-%d %H:%M:%S")] L$LINENO: '
+PS4='$(date "+%Y-%m-%d %H:%M:%S"): '
 
 BASE_PATH=$(cd $(dirname $0) && pwd)
 
@@ -93,6 +93,7 @@ COMMIT_HASH=${COMMIT_HASH:-none}
 if [[ -d $BASE_PATH/action_build ]]; then
     BUILD_DIR="action_build"
 fi
+ls -al
 echo "开始编译...$Dev => $Build_Mod"
 echo "正在应用配置文件..."
 chmod +x "$BASE_PATH/update.sh"
@@ -124,7 +125,7 @@ if [[ -d $TARGET_DIR ]]; then
 fi
 
 echo "并行下载 >>  线程数逐步递减"
-make download -j$(($(nproc) * 2)) || make download -j$(nproc) || make download -j1 || make download -j1 V=1 || make download -j1 V=s || exit 1
+make download -j$(($(nproc) * 2)) DISABLE_HASH_CHECK=1 || make download -j$(nproc) || make download -j1 || make download -j1 V=1 || make download -j1 V=s || exit 1
 echo "并行编译 >>  ..."
 make -j$(($(nproc) + 1)) || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=s || exit 1
 

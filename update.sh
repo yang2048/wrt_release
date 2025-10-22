@@ -131,7 +131,7 @@ update_feeds() {
         fi
     }
     # 检查并添加 small-package 源
-    add_feeds "small8" "https://github.com/kenzok8/small-package"
+    # add_feeds "small8" "https://github.com/kenzok8/small-package"
     # 检查并添加 kwrt 源
     add_feeds "kiddin9" "https://github.com/kiddin9/kwrt-packages.git"
     # 检查并添加 AWG-OpenWRT 源
@@ -178,10 +178,10 @@ remove_unwanted_packages() {
     )
     local small8_packages=(
         "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-app-alist"
-        "alist" "opkg" "smartdns" "luci-app-smartdns"
+        "alist" "opkg" "smartdns" "luci-app-smartdns" "tcping" "nikki"
     )
     local kiddin9_packages=(
-        "tcping" "nikki"
+        
     )
 
     for pkg in "${luci_packages[@]}"; do
@@ -244,10 +244,7 @@ update_golang() {
 }
 
 install_small8() {
-    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust \
-        sing-box v2ray-core v2ray-geodata v2dat v2ray-plugin tuic-client ipt2socks tcping trojan-plus simple-obfs \
-        shadowsocksr-libev taskd luci-lib-xterm luci-lib-taskd netdata luci-app-netdata nikki luci-app-nikki \
-        lucky luci-app-lucky tailscale luci-app-tailscale oaf open-app-filter 
+    # ./scripts/feeds install -p small8 -f v2ray-geodata v2dat v2ray-plugin tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev
 }
 
 install_fullconenat() {
@@ -260,11 +257,17 @@ install_fullconenat() {
 }
 
 install_kiddin9() {
-    ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus luci-app-change-mac luci-app-wan-mac easytier luci-app-easytier \
-        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go geoview \
-        quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store luci-app-oaf luci-app-control-timewol \
-        luci-app-wolplus luci-app-supervisord msd_lite luci-app-msd_lite mosdns luci-app-mosdns luci-app-adguardhome luci-app-amlogic \
-        luci-app-passwall luci-app-passwall2 luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng
+    # ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus easytier luci-app-easytier \
+    #     qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go geoview tcping xray-core cups \
+    #     quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store luci-app-oaf luci-app-control-timewol \
+    #     luci-app-wolplus luci-app-supervisord msd_lite luci-app-msd_lite mosdns luci-app-mosdns luci-app-adguardhome luci-app-amlogic \
+    #     luci-app-passwall luci-app-passwall2 luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng nikki luci-app-nikki 
+    ./scripts/feeds install -p kiddin9 -f cups luci-app-advancedplus easytier luci-app-easytier netdata luci-app-netdata \
+        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go taskd luci-lib-taskd luci-lib-xterm \
+        sing-box geoview tcping xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust v2dat \
+        tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev \
+        quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store oaf luci-app-oaf tailscale luci-app-tailscale \
+        luci-app-adguardhome luci-app-samba4
 }
 
 install_opentopd() {
@@ -289,14 +292,16 @@ install_feeds() {
             if [[ "$dir_name" == "small8" ]]; then
                 install_small8
                 install_fullconenat
+                echo "已安装 small8 必需软件包"
             elif [[ "$dir_name" == "opentopd" ]]; then
                 install_opentopd
             elif [[ "$dir_name" == "kiddin9" ]]; then
                 install_kiddin9
+                echo "已安装 kiddin9 必需软件包"
             elif [[ "$dir_name" == "node" ]]; then
                 install_node
             else
-                ./scripts/feeds install -f -ap $(basename "$dir")
+                ./scripts/feeds install -ap $(basename "$dir")
             fi
         fi
     done
@@ -421,7 +426,21 @@ apply_hash_fixes() {
     #     "29970b932d9abdb2a53085d71b4f4964ec3291d8d7c49794a04f2c35fbc6b665" \
     #     "f56db9077acb7750d0d5b3016ac7d5b9c758898c4d42a7a0956cea204448a182" \
     #     "smartdns"
-    find $BUILD_DIR/feeds/nss_packages/ -name "Makefile" -exec sed -i 's/PKG_MIRROR_HASH:=.*/PKG_MIRROR_HASH:=/' {} \;
+
+    # 修复 nss_packages 中的哈希值
+    if [ -d "$BUILD_DIR/feeds/nss_packages/" ]; then
+        find $BUILD_DIR/feeds/nss_packages/ -name "Makefile" -exec sed -i 's/PKG_MIRROR_HASH:=.*/PKG_MIRROR_HASH:=/' {} \;
+    fi
+    
+    # 修复 kiddin9/nikki 中的哈希值
+    if [ -d "$BUILD_DIR/feeds/kiddin9/nikki/" ]; then
+        find $BUILD_DIR/feeds/kiddin9/nikki/ -name "Makefile" -exec sed -i 's/PKG_MIRROR_HASH:=.*/PKG_MIRROR_HASH:=/' {} \;
+    fi
+    
+    # 修复 kiddin9/tcping 中的哈希值
+    if [ -d "$BUILD_DIR/feeds/kiddin9/tcping/" ]; then
+        find $BUILD_DIR/feeds/kiddin9/tcping/ -name "Makefile" -exec sed -i 's/PKG_MIRROR_HASH:=.*/PKG_MIRROR_HASH:=/' {} \;
+    fi
 }
 
 update_ath11k_fw() {
@@ -1121,7 +1140,7 @@ remove_tweaked_packages() {
 }
 
 update_argon() {
-    git clone https://github.com/LazuliKao/luci-theme-argon -b openwrt-24.10 ./feeds/luci/themes/luci-theme-argon-new
+    git clone --depth 1 https://github.com/LazuliKao/luci-theme-argon -b openwrt-24.10 ./feeds/luci/themes/luci-theme-argon-new
     rm -rf ./feeds/luci/themes/luci-theme-argon
     mv ./feeds/luci/themes/luci-theme-argon-new/luci-theme-argon ./feeds/luci/themes/luci-theme-argon
     rm -rf ./feeds/luci/applications/luci-app-argon-config
@@ -1227,8 +1246,10 @@ fix_libffi() {
 
 tailscale_use_awg() {
     local tailscale_makefile="$BUILD_DIR/package/feeds/small8/tailscale/Makefile"
-    sed -i 's|^PKG_SOURCE_URL:=.*|PKG_SOURCE_URL:=https://codeload.github.com/LiuTangLei/tailscale/tar.gz/v$(PKG_VERSION)?|' "$tailscale_makefile"
-    update_package "tailscale" "releases" "v1.88.3" || exit 1
+    if [ -f "$original_makefile" ]; then
+        sed -i 's|^PKG_SOURCE_URL:=.*|PKG_SOURCE_URL:=https://codeload.github.com/LiuTangLei/tailscale/tar.gz/v$(PKG_VERSION)?|' "$tailscale_makefile"
+        update_package "tailscale" "releases" "v1.88.3" || exit 1
+    fi
 }
 
 _trim_space() {

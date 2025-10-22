@@ -262,12 +262,13 @@ install_kiddin9() {
     #     quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store luci-app-oaf luci-app-control-timewol \
     #     luci-app-wolplus luci-app-supervisord msd_lite luci-app-msd_lite mosdns luci-app-mosdns luci-app-adguardhome luci-app-amlogic \
     #     luci-app-passwall luci-app-passwall2 luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng nikki luci-app-nikki 
-    ./scripts/feeds install -p kiddin9 -f cups luci-app-advancedplus easytier luci-app-easytier netdata luci-app-netdata \
+    ./scripts/feeds install -p kiddin9 -f cups luci-app-cupsd luci-app-advancedplus easytier luci-app-easytier netdata luci-app-netdata \
         qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go taskd luci-lib-taskd luci-lib-xterm \
         sing-box geoview tcping xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust v2dat \
-        tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev \
+        tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
         quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store oaf luci-app-oaf tailscale luci-app-tailscale \
-        luci-app-adguardhome luci-app-samba4
+        adguardhome luci-app-adguardhome luci-app-samba4 msd_lite luci-app-msd_lite luci-app-passwall2 mosdns luci-app-mosdns \
+        luci-app-amlogic open-app-filter luci-app-openclash nikki luci-app-nikki 
 }
 
 install_opentopd() {

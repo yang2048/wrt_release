@@ -268,7 +268,7 @@ install_kiddin9() {
         sing-box geoview tcping xray-core xray-plugin dns2tcp dns2socks hysteria naiveproxy shadowsocks-rust v2dat \
         tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev shadowsocks-libev v2ray-core v2ray-plugin \
         quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store oaf luci-app-oaf tailscale luci-app-tailscale \
-        luci-app-adguardhome luci-app-samba4 msd_lite luci-app-msd_lite luci-app-passwall2 mosdns luci-app-mosdns \
+        luci-app-adguardhome luci-app-samba4 msd_lite luci-app-msd_lite mosdns luci-app-mosdns \
         luci-app-amlogic open-app-filter luci-app-openclash nikki luci-app-nikki 
 }
 

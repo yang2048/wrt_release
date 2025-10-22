@@ -125,9 +125,9 @@ if [[ -d $TARGET_DIR ]]; then
 fi
 
 echo "并行下载 >>  线程数逐步递减"
-make download -j$(($(nproc) * 2)) DISABLE_HASH_CHECK=1 || make download -j$(nproc) || make download -j1 || make download -j1 V=1 || make download -j1 V=s || exit 1
+make download -j$(($(nproc) * 2)) DISABLE_HASH_CHECK=1 || make download -j$(nproc) || make download -j1 || make download -j1 V=s || df -hT || exit 1
 echo "并行编译 >>  ..."
-make -j$(($(nproc) + 1)) || make -j$(nproc) || make -j$(nproc) V=1 || make -j1 V=1 || make -j1 V=s || exit 1
+make -j$(($(nproc) + 1)) || make -j1 || make -j1 V=s || df -hT || exit 1
 
 FIRMWARE_DIR="$BASE_PATH/firmware"
 \rm -rf "$FIRMWARE_DIR"

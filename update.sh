@@ -245,6 +245,7 @@ update_golang() {
 
 install_small8() {
     # ./scripts/feeds install -p small8 -f v2ray-geodata v2dat v2ray-plugin tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev
+    echo "已安装 small8 必需软件包"
 }
 
 install_fullconenat() {
@@ -293,7 +294,6 @@ install_feeds() {
             if [[ "$dir_name" == "small8" ]]; then
                 install_small8
                 install_fullconenat
-                echo "已安装 small8 必需软件包"
             elif [[ "$dir_name" == "opentopd" ]]; then
                 install_opentopd
             elif [[ "$dir_name" == "kiddin9" ]]; then

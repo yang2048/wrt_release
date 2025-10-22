@@ -266,9 +266,9 @@ install_kiddin9() {
     ./scripts/feeds install -p kiddin9 -f cups luci-app-cupsd luci-app-advancedplus easytier luci-app-easytier netdata luci-app-netdata \
         qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go taskd luci-lib-taskd luci-lib-xterm \
         sing-box geoview tcping xray-core xray-plugin dns2tcp dns2socks haproxy hysteria naiveproxy shadowsocks-rust v2dat \
-        tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
+        tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev shadowsocks-libev v2ray-core v2ray-geodata v2ray-plugin \
         quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store oaf luci-app-oaf tailscale luci-app-tailscale \
-        adguardhome luci-app-adguardhome luci-app-samba4 msd_lite luci-app-msd_lite luci-app-passwall2 mosdns luci-app-mosdns \
+        luci-app-adguardhome luci-app-samba4 msd_lite luci-app-msd_lite luci-app-passwall2 mosdns luci-app-mosdns \
         luci-app-amlogic open-app-filter luci-app-openclash nikki luci-app-nikki 
 }
 
@@ -1242,7 +1242,7 @@ fix_libffi() {
         echo "Restoring original libffi Makefile from openwrt..."
         curl -fsSL -o "$original_makefile" "https://raw.githubusercontent.com/openwrt/packages/refs/heads/openwrt-24.10/libs/libffi/Makefile"
     fi
-    update_package "libffi" "releases" "v3.5.2" || exit 1
+    update_package "libffi" "releases" "v3.4.7" || exit 1
 }
 
 tailscale_use_awg() {
@@ -1355,7 +1355,7 @@ main() {
     # update_geoip
     # update_packages
     fix_node_build
-    fix_libffi
+    # fix_libffi
     tailscale_use_awg
     apply_hash_fixes
 EOF

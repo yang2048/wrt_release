@@ -50,6 +50,14 @@ jobs:
           echo -e "$(sudo lshw -short -C memory | grep GiB) \n"
           echo "--------------------------硬盘信息--------------------------"
           echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
+          echo "--------------------------清理硬盘--------------------------"
+          sudo apt-get -y purge firefox clang* google* llvm* mono* mongo* mysql* php*
+          sudo apt-get -y autoremove --purge
+          sudo apt-get clean
+          sudo rm -rf /etc/mysql /etc/php /usr/lib/{jvm,llvm} /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm} /usr/libexec/gcc/x86_64-linux-gnu/14 /usr/lib/x86_64-linux-gnu/{*clang*,*LLVM*} /home/linuxbrew
+          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+          rm -rf ~/{.cargo,.dotnet,.rustup}
+          echo "::endgroup::"
 
       # - name: Free disk space(释放磁盘空间)
         # uses: sbwml/actions@free-disk
@@ -78,15 +86,6 @@ jobs:
           remove-android: 'true'
           remove-docker-images: 'true'
           remove-haskell: 'true'
-        run: |
-          sudo apt-get -y purge firefox clang* google* llvm* mono* mongo* mysql* php*
-          sudo apt-get -y autoremove --purge
-          sudo apt-get clean
-          sudo rm -rf /etc/mysql /etc/php /usr/lib/{jvm,llvm} /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm} /usr/libexec/gcc/x86_64-linux-gnu/14 /usr/lib/x86_64-linux-gnu/{*clang*,*LLVM*} /home/linuxbrew
-          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
-          rm -rf ~/{.cargo,.dotnet,.rustup}
-          echo "::endgroup::"
-
 
       - name: Build System Setup(系统环境设置)
         run: |

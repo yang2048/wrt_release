@@ -258,18 +258,19 @@ install_fullconenat() {
 }
 
 install_kiddin9() {
-    # ./scripts/feeds install -p kiddin9 -f luci-app-advancedplus easytier luci-app-easytier \
-    #     qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go geoview tcping xray-core cups \
-    #     quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store luci-app-oaf luci-app-control-timewol \
-    #     luci-app-wolplus luci-app-supervisord msd_lite luci-app-msd_lite mosdns luci-app-mosdns luci-app-adguardhome luci-app-amlogic \
-    #     luci-app-passwall luci-app-passwall2 luci-app-openclash luci-app-homeproxy chinadns-ng luci-app-chinadns-ng nikki luci-app-nikki 
-    ./scripts/feeds install -p kiddin9 -f cups luci-app-cupsd luci-app-advancedplus easytier luci-app-easytier netdata luci-app-netdata \
-        qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go taskd luci-lib-taskd luci-lib-xterm \
+    # ./scripts/feeds install -p kiddin9 -f cups luci-app-cupsd luci-app-advancedplus easytier luci-app-easytier netdata luci-app-netdata \
+    #     qosmate luci-app-qosmate luci-app-unishare unishare ddns-go luci-app-ddns-go taskd luci-lib-taskd luci-lib-xterm \
+    #     sing-box geoview tcping xray-core xray-plugin dns2tcp dns2socks hysteria naiveproxy shadowsocks-rust v2dat \
+    #     tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev shadowsocks-libev v2ray-plugin \
+    #     quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store oaf luci-app-oaf tailscale luci-app-tailscale \
+    #     luci-app-adguardhome luci-app-samba4 msd_lite luci-app-msd_lite mosdns luci-app-mosdns \
+    #     luci-app-amlogic open-app-filter luci-app-openclash nikki luci-app-nikki 
+    ./scripts/feeds install -p kiddin9 -f netdata luci-app-netdata qosmate luci-app-qosmate taskd luci-lib-taskd luci-lib-xterm \
         sing-box geoview tcping xray-core xray-plugin dns2tcp dns2socks hysteria naiveproxy shadowsocks-rust v2dat \
         tuic-client ipt2socks trojan-plus simple-obfs shadowsocksr-libev shadowsocks-libev v2ray-plugin \
         quickstart luci-app-quickstart wrtbwmon luci-app-wrtbwmon luci-app-store oaf luci-app-oaf tailscale luci-app-tailscale \
-        luci-app-adguardhome luci-app-samba4 msd_lite luci-app-msd_lite mosdns luci-app-mosdns \
-        luci-app-amlogic open-app-filter luci-app-openclash nikki luci-app-nikki 
+        luci-app-adguardhome luci-app-samba4 mosdns luci-app-mosdns fullconenat fullconenat-nft luci-app-fullconenat \
+        luci-app-amlogic open-app-filter luci-app-openclash nikki luci-app-nikki luci-app-turboacc
 }
 
 install_opentopd() {
@@ -1323,7 +1324,7 @@ main() {
     remove_unwanted_packages
     remove_tweaked_packages
     # update_homeproxy
-    fix_default_set
+    # fix_default_set
     fix_miniupnpd
     update_golang
     change_dnsmasq2full
@@ -1335,7 +1336,7 @@ main() {
     update_ath11k_fw
     # fix_mkpkg_format_invalid
     # change_cpuusage
-    update_tcping
+    # update_tcping
     add_ax6600_led
     set_custom_task
     # apply_passwall_tweaks
@@ -1346,21 +1347,21 @@ main() {
     update_menu_location
     # update_proxy_app_menu_location
     fix_compile_coremark
-    update_dnsmasq_conf
+    # update_dnsmasq_conf
     add_backup_info_to_sysupgrade
-    update_mosdns_deconfig
-    fix_quickstart
-    update_oaf_deconfig
+    # update_mosdns_deconfig
+    # fix_quickstart
+    # update_oaf_deconfig
     # add_timecontrol
     add_gecoosac
     add_quickfile
     # update_lucky
     # update_smartdns
-    update_diskman
+    # update_diskman
     fix_rust_compile_error
     set_nginx_default_config
     update_uwsgi_limit_as
-    update_argon
+    # update_argon
     install_feeds
     update_adguardhome
     update_script_priority

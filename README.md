@@ -67,6 +67,45 @@ qemu-img convert -f raw -O vmdk immortalwrt-x86-64-generic-squashfs-combined-efi
 
 ## 然后参考[这里](#编译过程)进行编译。
 
+# 手动环境安装
+```
+sudo apt update -y
+sudo apt full-upgrade -y
+sudo apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint ccache cmake clang zstd jq curl wget vim ninja-build llvm lrzsz
+
+sudo apt install -y ack antlr3 bison cpio device-tree-compiler ecj fastjar g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
+  libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev \
+  libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools re2c rsync scons squashfs-tools swig 
+  upx-ucl xxd zlib1g-dev
+```
+## 手动编译
+```
+# 删除所有锁文件
+sudo find /tmp/ -name "*.flock" -type f -delete
+
+# 下载
+sudo make -j20 download V=s TIMEOUT=30 RETRY=3 PKG_MIRROR_HASH:= && echo "✅ 下载结束 [$(date "+%Y-%m-%d_%H:%M:%S")]"
+
+# 编译
+sudo make -j 2 V=s FORCE_UNSAFE_CONFIGURE=1 PKG_MIRROR_HASH:= 2>&1 | sudo tee build-$(date "+%Y-%m-%d_%H:%M:%S").log
+
+# 清除
+make clean (删除/bin和/build_dir目录)
+make dirclean (删除/bin和/build_dir目录及/staging_dir /toolchain /tmp /logs)
+
+
+
+```
+
+## 二次编译
+```
+./scripts/feeds update -a
+./scripts/feeds install -a
+make defconfig
+make download -j8
+make V=s -j$(nproc)
+```
+
 # 编译过程
 
 首先安装 Linux 系统，推荐 Ubuntu LTS
